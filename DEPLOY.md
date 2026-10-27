@@ -128,6 +128,25 @@
 
 ## 七、常见问题
 
+**推送时报 `Could not connect to server` / `Connection was reset`**
+→ 本机连不上 GitHub。脚本会自动读系统代理（Clash/V2Ray 等）并配给 git；如果没开代理就先开。
+手动配置：
+```bat
+git config --global http.proxy http://127.0.0.1:7897
+git config --global https.proxy http://127.0.0.1:7897
+```
+（端口按你代理软件里的实际端口填，Clash 常见 7890/7897，V2Ray 常见 10809）
+
+**推送时弹浏览器让登录 GitHub**
+→ 正常，这是 Git Credential Manager 的一次性授权。登完以后会记住，不用再登。
+如果窗口一闪而过或报 `could not read Username`，重跑一次 `部署到GitHub.bat` 即可。
+
+**报 `repository not found`**
+→ 用户名或仓库名写错了。先确认 `https://github.com/你的用户名/仓库名` 能在浏览器打开。
+
+**报 `failed to push some refs` / `non-fast-forward`**
+→ 建仓库时勾了 README，远端已经有提交。执行 `git pull --rebase origin main` 再推。
+
 **部署失败，日志里 `Address already in use`**
 → 本地也带着 `PORT` 环境变量了。本地不要设 `PORT`，代码默认 8790。
 
