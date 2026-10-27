@@ -1,0 +1,2987 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0e1116">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Agent 学习监督</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:#0e1116;color:#e6edf3;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;
+  font-size:15px;line-height:1.55;-webkit-text-size-adjust:100%}
+body{padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88em;
+  background:#1f2933;color:#7ee2b8;padding:1px 5px;border-radius:5px;word-break:break-word}
+.hdr{padding:calc(14px + env(safe-area-inset-top)) 16px 10px;position:sticky;top:0;z-index:20;
+  background:linear-gradient(180deg,#0e1116 78%,rgba(14,17,22,.86));border-bottom:1px solid #1c2430}
+.hdr-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.hdr h1{font-size:17px;margin:0;font-weight:650;letter-spacing:.2px}
+.hdr .sub{font-size:12px;color:#8b98a5;margin-top:2px}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:#1b2733;color:#8ad;border:1px solid #24344a}
+.badge.ok{background:#12301f;color:#3ddc97;border-color:#1e4d33}
+.badge.warn{background:#3a2410;color:#ffb020;border-color:#5a3a17}
+.badge.red{background:#3a1414;color:#ff6b6b;border-color:#5a2020}
+.badge.dim{background:#151b23;color:#6c7a88;border-color:#1e2733}
+main{padding:16px 18px 28px;max-width:960px;margin:0 auto}
+.card{background:#151b23;border:1px solid #1e2733;border-radius:14px;padding:14px;margin-bottom:12px}
+.card h2{font-size:13px;margin:0 0 10px;color:#8b98a5;font-weight:600;letter-spacing:.4px}
+.bar{height:8px;background:#26323f;border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,#2f9e6d,#3ddc97);border-radius:99px;transition:width .3s}
+.bar.blue>i{background:linear-gradient(90deg,#2b6cb0,#4a9eff)}
+.row{display:flex;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid #1a222c}
+.row:last-child{border-bottom:0}
+.row .txt{flex:1;min-width:0}
+.row .t1{font-size:14.5px}
+.row .t2{font-size:11.5px;color:#7d8896;margin-top:1px}
+.chk{width:26px;height:26px;border-radius:50%;border:2px solid #33414f;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;transition:.15s}
+.chk.on{background:#3ddc97;border-color:#3ddc97;color:#08150f;font-weight:700}
+.chk:active{transform:scale(.9)}
+.task{font-size:15px;line-height:1.75}
+.task .brk{display:block;height:6px}
+.flag{margin-top:10px;font-size:12.5px;color:#9fb0c0;background:#111922;border-left:3px solid #2f5570;
+  padding:8px 10px;border-radius:0 8px 8px 0}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tips{font-size:12.5px;color:#ffb020;background:#241a08;border:1px solid #4a3410;border-radius:10px;padding:9px 11px;margin-bottom:12px}
+.tips.red{color:#ff8080;background:#2a1010;border-color:#4a1c1c}
+.tips.blue{color:#8ec5ff;background:#0d1a28;border-color:#1e3a5c}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:10px;
+  padding:11px 15px;font-size:14px;font-weight:600;background:#22303d;color:#dbe6f0;cursor:pointer;min-height:44px}
+.btn:active{opacity:.75}
+.btn.pri{background:linear-gradient(135deg,#2f9e6d,#3ddc97);color:#06140e}
+.btn.blue{background:linear-gradient(135deg,#2b6cb0,#4a9eff);color:#03111f}
+.btn.ghost{background:transparent;border:1px solid #2a3644;color:#9fb0c0}
+.btn.block{display:flex;width:100%}
+.btn-row{display:flex;gap:8px;margin-top:10px}
+.btn-row .btn{flex:1}
+.grid7{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.hm{aspect-ratio:1/1;min-height:11px;border-radius:4px;background:#1a222c;position:relative}
+.hm.done{background:#3ddc97}
+.hm.half{background:#2b6a52}
+.hm.miss{background:#3a2020}
+.hm.today{outline:2px solid #4a9eff;outline-offset:1px}
+.hm.off{background:transparent}
+.legend{display:flex;gap:12px;font-size:11px;color:#7d8896;margin-top:10px;flex-wrap:wrap}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px;vertical-align:middle}
+.kpi{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.kpi .k{background:#0f151c;border:1px solid #1f2a36;border-radius:12px;padding:14px}
+.kpi .k b{display:block;font-size:22px;color:#e6edf3;line-height:1.2}
+.kpi .k span{font-size:11.5px;color:#7d8896}
+.tabbar{position:fixed;left:0;right:0;bottom:0;display:flex;background:#111820;
+  border-top:1px solid #1e2733;padding-bottom:env(safe-area-inset-bottom);z-index:30}
+.tabbar a{flex:1;text-align:center;padding:9px 0 7px;font-size:10.5px;color:#6c7a88;text-decoration:none}
+.tabbar a .ico{display:block;font-size:19px;line-height:1.25}
+.tabbar a.on{color:#3ddc97}
+textarea,input:not([type]),input[type=text],input[type=date],input[type=password],select{width:100%;background:#0f151c;color:#e6edf3;
+  border:1px solid #253140;border-radius:10px;padding:10px 12px;font-size:15px;font-family:inherit;outline:none}
+textarea{min-height:78px;resize:vertical}
+textarea:focus,input:focus,select:focus{border-color:#3ddc97}
+.block-item{display:flex;gap:8px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #1a222c;font-size:13.5px}
+.block-item:last-child{border-bottom:0}
+.block-item .x{color:#6c7a88;padding:2px 6px;flex:0 0 auto}
+.block-item .bt{flex:1;word-break:break-word}
+.small{font-size:12px;color:#7d8896;line-height:1.75}
+.mt8{margin-top:8px}.mt12{margin-top:12px}
+.empty{text-align:center;color:#5f6b78;font-size:13px;padding:18px 0}
+.card.cp{position:relative;padding-left:16px;margin-bottom:0}
+.card.cp::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:3px;border-radius:3px;background:#2b3a4a}
+.card.cp.pass::before{background:#3ddc97}
+.card.cp.fail::before{background:#ff6b6b}
+.card.cp h3{margin:0;font-size:14.5px}
+.card.cp .d{font-size:12px;color:#7d8896;margin:2px 0 6px}
+.card.cp .fix{font-size:12.5px;color:#9fb0c0;margin-top:6px}
+.auth{position:fixed;inset:0;z-index:100;background:radial-gradient(120% 80% at 50% 0%,#13202b 0%,#0b0f14 60%);
+  display:flex;align-items:center;justify-content:center;padding:24px 18px calc(24px + env(safe-area-inset-bottom))}
+.auth.hide{display:none}
+.authbox{width:100%;max-width:380px}
+.authbox .logo{width:52px;height:52px;border-radius:15px;background:#12301f;color:#3ddc97;display:flex;
+  align-items:center;justify-content:center;font-size:26px;margin-bottom:14px;border:1px solid #1e4d33}
+.authbox h1{font-size:21px;margin:0 0 4px;letter-spacing:.3px}
+.authbox .sub{font-size:12.5px;color:#7d8896;margin:0 0 22px}
+.auth-tabs{display:flex;gap:6px;background:#0f151c;border:1px solid #1e2733;border-radius:11px;padding:4px;margin-bottom:14px}
+.auth-tabs button{flex:1;border:0;background:transparent;color:#7d8896;font-size:13.5px;padding:9px 0;border-radius:8px;
+  font-family:inherit;cursor:pointer}
+.auth-tabs button.on{background:#1d2a36;color:#e6edf3}
+.auth input{display:block;margin-bottom:10px;height:46px;width:100%}
+.hide{display:none!important}
+.auth .err{color:#ff8080;font-size:12.5px;min-height:18px;margin:2px 0 8px}
+.auth .hint{font-size:11.5px;color:#5f6b78;margin-top:14px;line-height:1.7}
+.auth .hint input{height:38px;margin-top:6px;font-size:13px}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);
+  background:#22303d;color:#e6edf3;padding:9px 16px;border-radius:99px;font-size:13px;z-index:99;
+  opacity:0;transition:opacity .25s;pointer-events:none;max-width:80%;text-align:center}
+.toast.on{opacity:1}
+.q{font-size:14.5px;line-height:1.7;margin-bottom:10px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border:1px solid #253140;border-radius:10px;
+  margin-bottom:8px;font-size:14px;cursor:pointer}
+.opt:active{background:#1b242e}
+.opt .oi{width:20px;height:20px;border-radius:50%;border:1.5px solid #33414f;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;font-size:11px;color:#7d8896}
+.opt.sel{border-color:#4a9eff;background:#0f1d2c}
+.opt.right{border-color:#3ddc97;background:#0f2119}
+.opt.wrong{border-color:#ff6b6b;background:#241212}
+.opt .oi.right{background:#3ddc97;color:#06140e;border-color:#3ddc97}
+.opt .oi.wrong{background:#ff6b6b;color:#2a0c0c;border-color:#ff6b6b}
+.expl{font-size:12.5px;color:#9fb0c0;background:#111922;border-radius:9px;padding:9px 11px;margin-top:2px}
+.syncbar{display:flex;align-items:center;gap:8px;font-size:11.5px;color:#7d8896}
+.dot{width:7px;height:7px;border-radius:50%;background:#5f6b78;flex:0 0 auto}
+.dot.on{background:#3ddc97}
+.dot.err{background:#ff6b6b}
+.pc-only{display:none}
+@media (min-width:960px){
+  .hdr{padding-left:calc((100% - 960px)/2 + 18px);padding-right:calc((100% - 960px)/2 + 18px)}
+  .pc-only{display:block}
+  .ph-only{display:none}
+  body{font-size:15.5px}
+  .kpi{grid-template-columns:repeat(4,1fr)}
+  #view.cp{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+  #view.cp>.card{margin-bottom:0}
+  #view.me{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+  #view.me>.card{margin-bottom:0}
+  .cpi,.w2{grid-column:1/-1}
+}
+</style>
+</head>
+<body>
+<div class="auth hide" id="auth">
+  <div class="authbox">
+    <div class="logo">◎</div>
+    <h1>Agent 学习监督</h1>
+    <p class="sub">8 个月 · 195 天 · 每天一段代码 + 3 道题</p>
+    <div class="auth-tabs">
+      <button id="tabLogin" class="on" onclick="authMode('login')">登录</button>
+      <button id="tabReg" onclick="authMode('reg')">注册新账号</button>
+    </div>
+    <input id="au" type="text" placeholder="用户名" autocomplete="username" autocapitalize="off">
+    <input id="ap" type="password" placeholder="密码" autocomplete="current-password">
+    <input id="ap2" type="password" placeholder="再输一次密码" class="hide" autocomplete="new-password">
+    <div class="err" id="autherr"></div>
+    <button class="btn pri block" id="authbtn" onclick="doAuth()">登录</button>
+    <button class="btn ghost block mt8" onclick="offlineMode()">先离线用（数据只存这台电脑）</button>
+    <div class="hint">服务器地址（本机就是 127.0.0.1）<input id="asrv" type="text" placeholder="http://127.0.0.1:8790"></div>
+  </div>
+</div>
+<div class="hdr" id="hdr"></div>
+<main id="view"></main>
+<nav class="tabbar" id="tabbar">
+  <a href="#today" data-t="today"><span class="ico">◎</span>今天</a>
+  <a href="#quiz" data-t="quiz"><span class="ico">✎</span>答题</a>
+  <a href="#prog" data-t="prog"><span class="ico">▦</span>进度</a>
+  <a href="#cp" data-t="cp"><span class="ico">⚑</span>检查点</a>
+  <a href="#me" data-t="me"><span class="ico">⋯</span>我的</a>
+</nav>
+<div class="toast" id="toast"></div>
+<script>
+var DAYS = [
+    {
+        "id":  "W0-1",
+        "flag":  "`python -V` 显示 3.12.x；`git --version` 显示 2.x；`git log` 有首个 commit 且 `git status` 干净",
+        "dow":  2,
+        "phaseName":  "启动周",
+        "phase":  "W0",
+        "date":  "2026-10-27",
+        "task":  "装环境 + 建仓：\u003cbr\u003e`winget install --id Python.Python.3.12 -e`\u003cbr\u003e`winget install --id Git.Git -e`\u003cbr\u003e`winget install --id Microsoft.VisualStudioCode -e`\u003cbr\u003e装完关掉所有终端和 VS Code 重开；\u003cbr\u003e`git config --global user.name \"你的名字\"`\u003cbr\u003e`git config --global user.email \"你的邮箱\"`\u003cbr\u003e建 `D:\\dev\\agent-lab`、`git init`、写 `.gitignore`",
+        "week":  ""
+    },
+    {
+        "id":  "W0-2",
+        "flag":  "12 段全都能跑；报错能自己改对",
+        "dow":  3,
+        "phaseName":  "启动周",
+        "phase":  "W0",
+        "date":  "2026-10-28",
+        "task":  "12 个语法点，每个写 3 行跑一遍：变量 / f-string / list / dict / if / for / 函数+return / import / try-except / 读文件 / 写文件 / `len()`",
+        "week":  ""
+    },
+    {
+        "id":  "W0-3",
+        "flag":  "`notes/errors.md` 有 5 条；随手挑一条，30 秒内说清原因",
+        "dow":  4,
+        "phaseName":  "启动周",
+        "phase":  "W0",
+        "date":  "2026-10-29",
+        "task":  "故意造 5 个错：`NameError` / `TypeError` / `KeyError` / `IndexError` / `IndentationError`。每个抄下「最后一行 + 报错行号 + 我怎么改的」",
+        "week":  ""
+    },
+    {
+        "id":  "W0-4",
+        "flag":  "找到 bug，并写下「我在第几行加 print 才看出来的」",
+        "dow":  5,
+        "phaseName":  "启动周",
+        "phase":  "W0",
+        "date":  "2026-10-30",
+        "task":  "让 AI 生成一段 30 行有 bug 的代码，只用 print 定位，不许让 AI 说答案",
+        "week":  ""
+    },
+    {
+        "id":  "W0-5",
+        "flag":  "30 分钟内跑通 = 进 M1；\u003cbr\u003e跑不通 = 再练 3 天语法（重做 W0-2/W0-3），不要进 M1",
+        "dow":  6,
+        "phaseName":  "启动周",
+        "phase":  "W0",
+        "date":  "2026-10-31",
+        "task":  "诊断测试（AI 禁言）：不看任何参考，写「读 `data.txt` → 统计行数 → 打印前 3 行」约 15 行",
+        "week":  ""
+    },
+    {
+        "id":  "缓冲日",
+        "dow":  0,
+        "task":  "缓冲日：拿模型 API Key（存环境变量，不写进代码）、跑通第一次纯对话、配 PyPI 镜像、写 W0 复盘三段",
+        "phase":  "W0",
+        "week":  "W0",
+        "flag":  "",
+        "phaseName":  "启动周",
+        "date":  "2026-11-01"
+    },
+    {
+        "id":  "D1",
+        "flag":  "改一个字符串就能改变输出风格",
+        "dow":  1,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-02",
+        "task":  "把 11/01 的脚本改成 `chat(messages)` 函数；加 `system`；调两次，只改 system 让它换语气",
+        "week":  "W1"
+    },
+    {
+        "id":  "D2",
+        "flag":  "屏幕上出现 `tool_calls` 的 JSON",
+        "dow":  2,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-03",
+        "task":  "手敲 `TOOLS` 定义（一个 `get_time`，含 `name / description / parameters`），先不写循环，只打印模型返回的 `tool_calls`",
+        "week":  "W1"
+    },
+    {
+        "id":  "D3",
+        "flag":  "模型自己调 `get_time`，并答出正确时间",
+        "dow":  3,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-04",
+        "task":  "补完循环：模型要工具 → 你执行 → 结果以 `role=tool` 回传 → 再请求 → 直到它给答案",
+        "week":  "W1"
+    },
+    {
+        "id":  "D4",
+        "flag":  "`notes/D4.md` 写下 3 条「现象 → 原因」",
+        "dow":  4,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-05",
+        "task":  "改坏三处：① `range(5)`→`range(1)` ② 删 `tools` 参数 ③ 删 `description`",
+        "week":  "W1"
+    },
+    {
+        "id":  "D5",
+        "flag":  "模型改调新工具了（没调 = description 写得不清楚，这就是工具设计第一课）",
+        "dow":  5,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-06",
+        "task":  "把 `get_time` 改名成 `get_weather`、返回假数据，同步改 `name` 和 `description`",
+        "week":  "W1"
+    },
+    {
+        "id":  "D6",
+        "flag":  "跑一次能看到完整调用链",
+        "dow":  6,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-07",
+        "task":  "AI 禁言日：给这段 loop 加 3 行日志 `[step n] tool=xxx 耗时=xxms`，全程只查报错",
+        "week":  "W1"
+    },
+    {
+        "id":  "D7",
+        "flag":  "不看也能写出 80%，且能跑通",
+        "dow":  0,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-08",
+        "task":  "重写日：关掉所有参考，凭记忆重写整个脚本（允许回看 3 次）",
+        "week":  "W1"
+    },
+    {
+        "id":  "D8",
+        "flag":  "模型能主动读文件并引用内容",
+        "dow":  1,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-09",
+        "task":  "加第二个工具 `read_file(path)`：读本地 txt，限制 2000 字",
+        "week":  "W2"
+    },
+    {
+        "id":  "D9",
+        "flag":  "传个假路径，模型会说「文件不存在」",
+        "dow":  2,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-10",
+        "task":  "工具执行异常不崩溃：文件不存在时，把错误字符串回传给模型而不是抛异常",
+        "week":  "W2"
+    },
+    {
+        "id":  "D10",
+        "flag":  "故意让它死循环，5 步后自动停",
+        "dow":  3,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-11",
+        "task":  "加 `max_steps=5`；超限就停并说明原因；加「没有 tool_calls 就结束」",
+        "week":  "W2"
+    },
+    {
+        "id":  "D11",
+        "flag":  "每次运行末尾打印「本次花费 ¥0.00x」",
+        "dow":  4,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-12",
+        "task":  "加 token 统计与成本估算（输入/输出分开算，按你的模型单价）",
+        "week":  "W2"
+    },
+    {
+        "id":  "D12",
+        "flag":  "写下一句「描述怎么改，模型就怎么选」",
+        "dow":  5,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-13",
+        "task":  "把 3 个工具描述各补一句「什么时候该用 / 什么时候不该用」",
+        "week":  "W2"
+    },
+    {
+        "id":  "D13",
+        "flag":  "5 个改动都能独立复现",
+        "dow":  6,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-14",
+        "task":  "AI 禁言日：把 D8–D12 五次改动逐个复现一遍，全程只靠自己的笔记",
+        "week":  "W2"
+    },
+    {
+        "id":  "D14",
+        "flag":  "一次写对，最多回看 1 次",
+        "dow":  0,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-15",
+        "task":  "重写日：关文件重写整个 loop（2 工具 + 异常 + 上限 + 日志 + 成本）",
+        "week":  "W2"
+    },
+    {
+        "id":  "D15",
+        "flag":  "屏幕上看到真实内容，不是假数据",
+        "dow":  1,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-16",
+        "task":  "接一个 RSS 源（免 key，最稳：36kr / 少数派 / GitHub Trending 的 `.atom`），先用 `urllib` 拉下来、只打印前 500 字",
+        "week":  "W3"
+    },
+    {
+        "id":  "D16",
+        "flag":  "打印出 10 条结构化数据",
+        "dow":  2,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-17",
+        "task":  "用 `xml.etree` 解析出「标题 + 链接 + 时间」三项，存成 list",
+        "week":  "W3"
+    },
+    {
+        "id":  "D17",
+        "flag":  "断网跑一次，模型说「取数失败」而不是崩",
+        "dow":  3,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-18",
+        "task":  "处理三种失败：超时、非 200 状态码、字段缺失；每种都返回一句人话给模型",
+        "week":  "W3"
+    },
+    {
+        "id":  "D18",
+        "flag":  "能说清「为什么第 3 问的历史里带着第 1 问」",
+        "dow":  4,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-19",
+        "task":  "多轮：同一会话连问 3 个彼此相关的问题，观察 `messages` 数组怎么长",
+        "week":  "W3"
+    },
+    {
+        "id":  "D19",
+        "flag":  "记录一组「裁剪前 / 后」的数字",
+        "dow":  5,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-20",
+        "task":  "上下文裁剪：只保留 system + 最近 6 条；对比裁剪前后的回答质量与花费",
+        "week":  "W3"
+    },
+    {
+        "id":  "D20",
+        "flag":  "README 有「已知限制」，≥5 条",
+        "dow":  6,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-21",
+        "task":  "AI 禁言日：`git log` 从头看一遍自己的 20 次提交，把踩过的坑整理进 `README.md` 的「已知限制」章节",
+        "week":  "W3"
+    },
+    {
+        "id":  "D21",
+        "flag":  "不看也能跑通",
+        "dow":  0,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-22",
+        "task":  "重写日：3 工具 + 多轮 + 裁剪 + 错误处理，一次写完",
+        "week":  "W3"
+    },
+    {
+        "id":  "D22",
+        "flag":  "60 分钟内跑通",
+        "dow":  1,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-23",
+        "task":  "不看任何参考，从空文件重写一版（第 3 次重写）",
+        "week":  "W4"
+    },
+    {
+        "id":  "D23",
+        "flag":  "同一个脚本换 3 个模型都跑通",
+        "dow":  2,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-24",
+        "task":  "把 `chat()` 里的 `BASE_URL` 换成第二家平台（DeepSeek 或通义），只改环境变量",
+        "week":  "W4"
+    },
+    {
+        "id":  "D24",
+        "flag":  "模型能先搜再读",
+        "dow":  3,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-25",
+        "task":  "加第 4 个工具 `search_notes(keyword)`：在本地一个文件夹里按关键词找文件名",
+        "week":  "W4"
+    },
+    {
+        "id":  "D25",
+        "flag":  "故意传错参数，模型能自己改对",
+        "dow":  4,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-26",
+        "task":  "让工具「自愈」：报错里带可执行提示（如「合法值只有 a/b/c」）",
+        "week":  "W4"
+    },
+    {
+        "id":  "D26",
+        "flag":  "改配置不改代码",
+        "dow":  5,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-27",
+        "task":  "加 `config.json`：把模型名、阈值、步数上限、源地址全挪出去",
+        "week":  "W4"
+    },
+    {
+        "id":  "D27",
+        "flag":  "有一张「5 次运行」的表",
+        "dow":  6,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-28",
+        "task":  "AI 禁言日：一次连续跑 5 个不同问题，记录每次的耗时和花费",
+        "week":  "W4"
+    },
+    {
+        "id":  "D28",
+        "flag":  "40 分钟内写完并跑通 = 提前达标；\u003cbr\u003e60 分钟写不完 = 正常，继续 W5；\u003cbr\u003e完全写不出 = 回到 W4-1 再来一周，不进 W5",
+        "dow":  0,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-29",
+        "task":  "重写日 + 检查点 1：关文件写出「2 工具 + 上限 + 错误回传」，计时",
+        "week":  "W4"
+    },
+    {
+        "id":  "D29",
+        "flag":  "一页 `design.md`，能说清输入输出",
+        "dow":  1,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-30",
+        "task":  "只写文档不写代码：定题「每日简报 Agent」。写清 3 个源、输出格式、失败怎么办",
+        "week":  "W5"
+    },
+    {
+        "id":  "D30",
+        "flag":  "`raw.json` 里有真实内容",
+        "dow":  2,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-01",
+        "task":  "只写抓取模块，完全不接模型，结果存 `data/raw.json`",
+        "week":  "W5"
+    },
+    {
+        "id":  "D31",
+        "flag":  "一条 list 里有 3 个源的数据",
+        "dow":  3,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-02",
+        "task":  "3 个源逐个跑通，统一成 `{source, title, url, time}` 结构",
+        "week":  "W5"
+    },
+    {
+        "id":  "D32",
+        "flag":  "拔网线跑一次，10 秒后放弃并报错",
+        "dow":  4,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-03",
+        "task":  "加超时（每源 10s）+ 重试（最多 2 次，间隔递增）",
+        "week":  "W5"
+    },
+    {
+        "id":  "D33",
+        "flag":  "故意写错一个源地址，其余照常出结果",
+        "dow":  5,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-04",
+        "task":  "单源失败降级：跳过并记录，不影响整体",
+        "week":  "W5"
+    },
+    {
+        "id":  "D34",
+        "flag":  "中文标题不乱码",
+        "dow":  6,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-05",
+        "task":  "AI 禁言日：加 User-Agent 与编码处理（`resp.read().decode(\"utf-8\", \"ignore\")`），解决中文乱码",
+        "week":  "W5"
+    },
+    {
+        "id":  "D35",
+        "flag":  "不看参考，30 分钟内跑通",
+        "dow":  0,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-06",
+        "task":  "重写日：重写整个抓取模块",
+        "week":  "W5"
+    },
+    {
+        "id":  "D36",
+        "flag":  "生成一份人能读完的摘要",
+        "dow":  1,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-07",
+        "task":  "接模型做摘要，每条 ≤60 字，控制总长度",
+        "week":  "W6"
+    },
+    {
+        "id":  "D37",
+        "flag":  "重复条目被合并",
+        "dow":  2,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-08",
+        "task":  "加去重（标题归一化 + 简易 Jaccard，不要上向量库）",
+        "week":  "W6"
+    },
+    {
+        "id":  "D38",
+        "flag":  "一条命令出报告",
+        "dow":  3,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-09",
+        "task":  "做成一键运行：`python run.py` 走完全流程，输出 `report.md`",
+        "week":  "W6"
+    },
+    {
+        "id":  "D39",
+        "flag":  "有一张「本次运行」的记录",
+        "dow":  4,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-10",
+        "task":  "端到端真实跑一次，记录耗时、成本、失败源",
+        "week":  "W6"
+    },
+    {
+        "id":  "D40",
+        "flag":  "30 秒内从日志看出这次为什么失败",
+        "dow":  5,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-11",
+        "task":  "加 `logs/{date}.log`：开始/结束/耗时/成功源数/花费",
+        "week":  "W6"
+    },
+    {
+        "id":  "D41",
+        "flag":  "陌生人照 README 能跑起来",
+        "dow":  6,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-12",
+        "task":  "AI 禁言日：写 README（怎么装 / 怎么跑 / 做了什么取舍）",
+        "week":  "W6"
+    },
+    {
+        "id":  "D42",
+        "flag":  "写得出 → 进 M2；\u003cbr\u003e写不出 → 守住 M1 再练一周，不要进 M2（地基没浇完就上楼，后面全塌）",
+        "dow":  0,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-13",
+        "task":  "检查点 2 + M1 复盘：关文件写 loop，40 分钟计时",
+        "week":  "W6"
+    },
+    {
+        "id":  "D43",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-14",
+        "task":  "把现有 3 个工具重审：一个工具只做一件事，能拆就拆",
+        "week":  "W7"
+    },
+    {
+        "id":  "D44",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-15",
+        "task":  "参数加约束：`enum`（固定选项）、`required`（必填）、类型写死",
+        "week":  "W7"
+    },
+    {
+        "id":  "D45",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-16",
+        "task":  "每个 description 补两句：什么时候该用 / 什么时候不该用",
+        "week":  "W7"
+    },
+    {
+        "id":  "D46",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-17",
+        "task":  "精简返回值：只回模型真正要的字段，长文本截断并注明「已截断」",
+        "week":  "W7"
+    },
+    {
+        "id":  "D47",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-18",
+        "task":  "工具失败要「自愈」：报错里带可执行提示",
+        "week":  "W7"
+    },
+    {
+        "id":  "D48",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-19",
+        "task":  "重写 `tools.py`（不看参考，允许回看 1 次）",
+        "week":  "W7"
+    },
+    {
+        "id":  "D49",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-20",
+        "task":  "复盘：写《工具设计的 5 条规则》，每条配一个你踩过的例子",
+        "week":  "W7"
+    },
+    {
+        "id":  "D50",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-21",
+        "task":  "会话持久化：`messages` 存成 `sessions/xxx.json`，能重开继续聊",
+        "week":  "W8"
+    },
+    {
+        "id":  "D51",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-22",
+        "task":  "加载历史：启动时读回 session，验证第 5 轮还记得第 1 轮",
+        "week":  "W8"
+    },
+    {
+        "id":  "D52",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-23",
+        "task":  "摘要式记忆：10 轮以前的内容压成一段摘要塞回 system",
+        "week":  "W8"
+    },
+    {
+        "id":  "D53",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-24",
+        "task":  "上下文预算：估算 token，超阈值先丢最旧的，保留 system + 最近 6 条",
+        "week":  "W8"
+    },
+    {
+        "id":  "D54",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-25",
+        "task":  "长会话压测：连问 20 轮，看第几轮开始「忘事」，记下这个数字",
+        "week":  "W8"
+    },
+    {
+        "id":  "D55",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-26",
+        "task":  "重写整个会话层",
+        "week":  "W8"
+    },
+    {
+        "id":  "D56",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-27",
+        "task":  "复盘：写清「记忆的三种做法各适合什么场景」",
+        "week":  "W8"
+    },
+    {
+        "id":  "D57",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-28",
+        "task":  "要求模型只输出 JSON（`{\"title\":..,\"tags\":[..],\"score\":0-100}`）",
+        "week":  "W9"
+    },
+    {
+        "id":  "D58",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-29",
+        "task":  "解析容错：`json.loads` 失败就把错误回传让它自己修，最多重试 2 次",
+        "week":  "W9"
+    },
+    {
+        "id":  "D59",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-30",
+        "task":  "字段校验：缺字段 / 类型错就打回重写，不让脏数据往下流",
+        "week":  "W9"
+    },
+    {
+        "id":  "D60",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-31",
+        "task":  "把这份 JSON 接到下一步代码（排序、过滤、存文件）",
+        "week":  "W9"
+    },
+    {
+        "id":  "D61",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-01",
+        "task":  "批量跑 10 条输入，统计「一次就合法」的比例（这就是你的第一个指标）",
+        "week":  "W9"
+    },
+    {
+        "id":  "D62",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-02",
+        "task":  "重写：结构化输出 + 校验 + 重试",
+        "week":  "W9"
+    },
+    {
+        "id":  "D63",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-03",
+        "task":  "复盘：记下「一次合格率」，M5 会拿它做对比基线",
+        "week":  "W9"
+    },
+    {
+        "id":  "D64",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-04",
+        "task":  "加简单路由：按关键词决定走哪条工具链（先写死规则，不用模型）",
+        "week":  "W10"
+    },
+    {
+        "id":  "D65",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-05",
+        "task":  "配置外置：源地址、模型名、阈值、步数上限全挪进 `config.json`",
+        "week":  "W10"
+    },
+    {
+        "id":  "D66",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-06",
+        "task":  "整合：3 工具 + 多轮记忆 + 结构化输出 + 配置，跑通一个完整场景",
+        "week":  "W10"
+    },
+    {
+        "id":  "D67",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-07",
+        "task":  "端到端：用它真实解决你自己的一件小事（查资料 / 整理文件 / 汇总信息）",
+        "week":  "W10"
+    },
+    {
+        "id":  "D68",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-08",
+        "task":  "异常注入：断网、错参数、超长输入、空输入，四种各跑一次",
+        "week":  "W10"
+    },
+    {
+        "id":  "D69",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-09",
+        "task":  "重写入口 `main.py`",
+        "week":  "W10"
+    },
+    {
+        "id":  "D70",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-10",
+        "task":  "月复盘（四段式）+ `git tag m2-done`",
+        "week":  "W10"
+    },
+    {
+        "id":  "D71",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-11",
+        "task":  "3 个源统一结构 + 落盘 `data/2027-01-17.json`，按日期归档",
+        "week":  "W10"
+    },
+    {
+        "id":  "D72",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-12",
+        "task":  "并发抓取（`concurrent.futures`），把总耗时从 30s 压到 10s 内",
+        "week":  "W10"
+    },
+    {
+        "id":  "D73",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-13",
+        "task":  "源站改版演习：手动改一个源的 CSS/XML 路径，看你的代码怎么报错、怎么降级",
+        "week":  "W10"
+    },
+    {
+        "id":  "D74",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-14",
+        "task":  "把「失败源清单」写进 `report.md` 末尾（让读者知道缺了什么）",
+        "week":  "W10"
+    },
+    {
+        "id":  "D75",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-15",
+        "task":  "加「抓取成功率」统计，写入日志",
+        "week":  "W10"
+    },
+    {
+        "id":  "D76",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-16",
+        "task":  "重写 `fetch.py`",
+        "week":  "W10"
+    },
+    {
+        "id":  "D77",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-17",
+        "task":  "复盘：写《抓取层的 6 个必做检查》",
+        "week":  "W10"
+    },
+    {
+        "id":  "D78",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-18",
+        "task":  "摘要提示词迭代 3 版：v1 直译 → v2 加「说人话」约束 → v3 加「保留数字」约束",
+        "week":  "W10"
+    },
+    {
+        "id":  "D79",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-19",
+        "task":  "对比 3 版输出，选最好的一版并记录理由（这就是 prompt 工程的全部真相）",
+        "week":  "W10"
+    },
+    {
+        "id":  "D80",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-20",
+        "task":  "去重升级：标题归一化 + 内容相似度，误杀要能看出来",
+        "week":  "W10"
+    },
+    {
+        "id":  "D81",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-21",
+        "task":  "控制单次成本：批处理多条、限制输出长度，把每条压到 1 分钱内",
+        "week":  "W10"
+    },
+    {
+        "id":  "D82",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-22",
+        "task":  "生成最终 `report.md`：分组、排序、带来源链接",
+        "week":  "W10"
+    },
+    {
+        "id":  "D83",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-23",
+        "task":  "重写主流程",
+        "week":  "W10"
+    },
+    {
+        "id":  "D84",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-24",
+        "task":  "复盘 + 更新 README 的「成本」章节",
+        "week":  "W10"
+    },
+    {
+        "id":  "D85",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-25",
+        "task":  "注册 PushPlus 拿 token（或配 QQ 邮箱 SMTP 授权码），先单独测通「发一条消息」",
+        "week":  "W10"
+    },
+    {
+        "id":  "D86",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-26",
+        "task":  "把推送封装成 `push(text)`，失败重试 2 次",
+        "week":  "W10"
+    },
+    {
+        "id":  "D87",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-27",
+        "task":  "手动跑通全流程 + 推送成功",
+        "week":  "W10"
+    },
+    {
+        "id":  "D88",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-28",
+        "task":  "设定时任务（命令行，不用界面）：\u003cbr\u003e`schtasks /Create /TN \"daily-brief\" /TR \"C:\\Python312\\python.exe D:\\dev\\agent-lab\\run.py\" /SC DAILY /ST 08:30 /F`\u003cbr\u003e先 `schtasks /Run /TN \"daily-brief\"` 手动触发一次验证",
+        "week":  "W10"
+    },
+    {
+        "id":  "D89",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-29",
+        "task":  "断网、Key 失效、源改版，三种故障各演练一次，确认都能给你发「我挂了」的通知",
+        "week":  "W10"
+    },
+    {
+        "id":  "D90",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-30",
+        "task":  "重写 `run.py`，把流程拆成 `fetch → dedupe → summarize → render → push`",
+        "week":  "W10"
+    },
+    {
+        "id":  "D91",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-31",
+        "task":  "复盘 + 手画一张架构图拍照存档",
+        "week":  "W10"
+    },
+    {
+        "id":  "D92",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-01",
+        "task":  "不写新功能。每天 10 分钟看日志（固定动作，不占主段），异常记进 `blocked.md`",
+        "week":  "W10"
+    },
+    {
+        "id":  "D93",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-02",
+        "task":  "同上 + 修 1 个日志里发现的 bug",
+        "week":  "W10"
+    },
+    {
+        "id":  "D94",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-03",
+        "task":  "同上 + 补 README 的「已知限制」",
+        "week":  "W10"
+    },
+    {
+        "id":  "D95",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-04",
+        "task":  "同上 + 把 7 天的运行数据做成一张表（天数/成功/失败原因/花费）",
+        "week":  "W10"
+    },
+    {
+        "id":  "D96",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-05",
+        "task":  "同上 + 上线前清理：`git log -p | findstr /i \"key\"` 确认仓库里没 key",
+        "week":  "W10"
+    },
+    {
+        "id":  "D97",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-06",
+        "task":  "同上 + 写《连续运行的 3 个隐性成本》（不是为了交作业，为了 M6 面试）",
+        "week":  "W10"
+    },
+    {
+        "id":  "D98",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-07",
+        "task":  "重写日 + 周复盘",
+        "week":  "W10"
+    },
+    {
+        "id":  "D99",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-08",
+        "task":  "只做三件事，允许减半：\u003cbr\u003e① 每天 10 分钟看线上日志有没有异常\u003cbr\u003e② 把 M1 的 loop 再凭记忆重写一次（这周就做这一件重活）\u003cbr\u003e③ 补齐前面欠的笔记\u003cbr\u003e不要开新内容",
+        "week":  "W10"
+    },
+    {
+        "id":  "D100",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-09",
+        "task":  "只做三件事，允许减半：\u003cbr\u003e① 每天 10 分钟看线上日志有没有异常\u003cbr\u003e② 把 M1 的 loop 再凭记忆重写一次（这周就做这一件重活）\u003cbr\u003e③ 补齐前面欠的笔记\u003cbr\u003e不要开新内容",
+        "week":  "W10"
+    },
+    {
+        "id":  "D101",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-10",
+        "task":  "只做三件事，允许减半：\u003cbr\u003e① 每天 10 分钟看线上日志有没有异常\u003cbr\u003e② 把 M1 的 loop 再凭记忆重写一次（这周就做这一件重活）\u003cbr\u003e③ 补齐前面欠的笔记\u003cbr\u003e不要开新内容",
+        "week":  "W10"
+    },
+    {
+        "id":  "D102",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-11",
+        "task":  "只做三件事，允许减半：\u003cbr\u003e① 每天 10 分钟看线上日志有没有异常\u003cbr\u003e② 把 M1 的 loop 再凭记忆重写一次（这周就做这一件重活）\u003cbr\u003e③ 补齐前面欠的笔记\u003cbr\u003e不要开新内容",
+        "week":  "W10"
+    },
+    {
+        "id":  "D103",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-12",
+        "task":  "只做三件事，允许减半：\u003cbr\u003e① 每天 10 分钟看线上日志有没有异常\u003cbr\u003e② 把 M1 的 loop 再凭记忆重写一次（这周就做这一件重活）\u003cbr\u003e③ 补齐前面欠的笔记\u003cbr\u003e不要开新内容",
+        "week":  "W10"
+    },
+    {
+        "id":  "D104",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-13",
+        "task":  "只做三件事，允许减半：\u003cbr\u003e① 每天 10 分钟看线上日志有没有异常\u003cbr\u003e② 把 M1 的 loop 再凭记忆重写一次（这周就做这一件重活）\u003cbr\u003e③ 补齐前面欠的笔记\u003cbr\u003e不要开新内容",
+        "week":  "W10"
+    },
+    {
+        "id":  "D105",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-14",
+        "task":  "只做三件事，允许减半：\u003cbr\u003e① 每天 10 分钟看线上日志有没有异常\u003cbr\u003e② 把 M1 的 loop 再凭记忆重写一次（这周就做这一件重活）\u003cbr\u003e③ 补齐前面欠的笔记\u003cbr\u003e不要开新内容",
+        "week":  "W10"
+    },
+    {
+        "id":  "D106",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-15",
+        "task":  "选部署方式，三选一：① 免费容器（Render / Fly.io，首选）② 轻量云服务器（60–100 元/月）③ 本机常驻 + 内网穿透（cpolar / ngrok，最快但电脑必须开着）。选最省事的，先上线再优化",
+        "week":  "W16"
+    },
+    {
+        "id":  "D107",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-16",
+        "task":  "`pip install flask`（这一个月允许用这一个依赖，因为写 Web 样板不值得手敲）",
+        "week":  "W16"
+    },
+    {
+        "id":  "D108",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-17",
+        "task":  "写 `/chat` 接口（收问题 → 调你的循环 → 返回 JSON）+ 一个极简 HTML 页面",
+        "week":  "W16"
+    },
+    {
+        "id":  "D109",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-18",
+        "task":  "部署到线上，跑通「打开网页 → 提问 → 有回答」",
+        "week":  "W16"
+    },
+    {
+        "id":  "D110",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-19",
+        "task":  "发给 1–2 个朋友用，把他们的原话记下来（包括「这有什么用」）",
+        "week":  "W16"
+    },
+    {
+        "id":  "D111",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-20",
+        "task":  "看第一天日志：报错、慢请求、花费",
+        "week":  "W16"
+    },
+    {
+        "id":  "D112",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-21",
+        "task":  "复盘：写《上线第一天踩的坑》+ 重写 `app.py`",
+        "week":  "W16"
+    },
+    {
+        "id":  "D113",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-22",
+        "task":  "密钥管理：全走环境变量，仓库里搜一遍确认没有任何 key",
+        "week":  "W17"
+    },
+    {
+        "id":  "D114",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-23",
+        "task":  "成本上限：设每日预算，超了直接拒绝并返回人话（这条比限流重要）",
+        "week":  "W17"
+    },
+    {
+        "id":  "D115",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-24",
+        "task":  "访问控制：简单 token 或密码，防止被扫到后白嫖",
+        "week":  "W17"
+    },
+    {
+        "id":  "D116",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-25",
+        "task":  "限流：每 IP 每分钟 N 次，超出返回 429",
+        "week":  "W17"
+    },
+    {
+        "id":  "D117",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-26",
+        "task":  "错误处理：模型超时 / 额度用尽 / 输入过长，各自给一句人话",
+        "week":  "W17"
+    },
+    {
+        "id":  "D118",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-27",
+        "task":  "存活监控：每天固定时间探活一次，挂了给你发通知",
+        "week":  "W17"
+    },
+    {
+        "id":  "D119",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-28",
+        "task":  "复盘：更新 README「部署」章节，写清重启命令",
+        "week":  "W17"
+    },
+    {
+        "id":  "D120",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-01",
+        "task":  "列 15 个目标岗位（AI 交付实施 / 中小公司 AI 应用 / 传统行业数字化），抄下每条的 JD 关键词",
+        "week":  "W18"
+    },
+    {
+        "id":  "D121",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-02",
+        "task":  "用 §附录E 四段式把项目①写成一页（没有数字就先写「连续 14 天」，数字后面补）",
+        "week":  "W18"
+    },
+    {
+        "id":  "D122",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-03",
+        "task":  "简历一页初稿（只投 5 家，不追求完美）",
+        "week":  "W18"
+    },
+    {
+        "id":  "D123",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-04",
+        "task":  "投 3 家",
+        "week":  "W18"
+    },
+    {
+        "id":  "D124",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-05",
+        "task":  "投 2 家 + 开始记 `tracking.md`（公司 / 岗位 / JD 关键词 / 投递日 / 状态）",
+        "week":  "W18"
+    },
+    {
+        "id":  "D125",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-06",
+        "task":  "重写日：把 M1 的 loop 再写一遍（第 5 次），计时",
+        "week":  "W18"
+    },
+    {
+        "id":  "D126",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-07",
+        "task":  "复盘：5 家 JD 里出现了哪些你完全没听过的词？记进 `later.md`，现在不要学",
+        "week":  "W18"
+    },
+    {
+        "id":  "D127",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-08",
+        "task":  "选场景：「读我自己的资料回答问题」（资料 = 你的笔记 / 行业文档 / 论文，20–50 篇）",
+        "week":  "W19"
+    },
+    {
+        "id":  "D128",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-09",
+        "task":  "收集资料，清洗成纯文本，按篇存好",
+        "week":  "W19"
+    },
+    {
+        "id":  "D129",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-10",
+        "task":  "写 `design.md`：用户会问什么、答不出时怎么办、怎么算答对",
+        "week":  "W19"
+    },
+    {
+        "id":  "D130",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-11",
+        "task":  "搭最小可跑版本：不接向量库，先「关键词检索 top3 篇 → 全文塞给模型」（很土，但能先看到效果）",
+        "week":  "W19"
+    },
+    {
+        "id":  "D131",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-12",
+        "task":  "搭最小可跑版本：不接向量库，先「关键词检索 top3 篇 → 全文塞给模型」（很土，但能先看到效果）",
+        "week":  "W19"
+    },
+    {
+        "id":  "D132",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-13",
+        "task":  "搭最小可跑版本：不接向量库，先「关键词检索 top3 篇 → 全文塞给模型」（很土，但能先看到效果）",
+        "week":  "W19"
+    },
+    {
+        "id":  "D133",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-14",
+        "task":  "月复盘 + `git tag m4-done`",
+        "week":  "W19"
+    },
+    {
+        "id":  "D134",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-15",
+        "task":  "定题：「每天从 X 个源里找出跟我关心主题相关的 5 条」",
+        "week":  "W20"
+    },
+    {
+        "id":  "D135",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-16",
+        "task":  "版本 A｜固定流程：写死 `抓 5 个源 → 去重 → 摘要 → 排前 5`，不让模型做任何决策",
+        "week":  "W20"
+    },
+    {
+        "id":  "D136",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-17",
+        "task":  "版本 B｜自主 Agent：给 3 个工具（`fetch_feed` / `read_file` / `search`），让模型自己决定抓哪几个、抓几次、要不要深读",
+        "week":  "W20"
+    },
+    {
+        "id":  "D137",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-18",
+        "task":  "各跑 20 条问题，逐条记录：答对没 / 花多少 / 用几秒 / 调了几次工具",
+        "week":  "W20"
+    },
+    {
+        "id":  "D138",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-19",
+        "task":  "各跑 20 条问题，逐条记录：答对没 / 花多少 / 用几秒 / 调了几次工具",
+        "week":  "W20"
+    },
+    {
+        "id":  "D139",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-20",
+        "task":  "各跑 20 条问题，逐条记录：答对没 / 花多少 / 用几秒 / 调了几次工具",
+        "week":  "W20"
+    },
+    {
+        "id":  "D140",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-21",
+        "task":  "复盘：先别下结论，把原始数据摆出来",
+        "week":  "W20"
+    },
+    {
+        "id":  "D141",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-22",
+        "task":  "从真实需求造 30 条问题，其中 8–10 条故意是「资料里没有答案」的（考它会不会编）",
+        "week":  "W21"
+    },
+    {
+        "id":  "D142",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-23",
+        "task":  "定义「答对」：可判定的标准（必须含某个事实 / 必须说「资料里没有」）",
+        "week":  "W21"
+    },
+    {
+        "id":  "D143",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-24",
+        "task":  "人工标注期望答案，存成 `eval/cases.json`",
+        "week":  "W21"
+    },
+    {
+        "id":  "D144",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-25",
+        "task":  "写评测脚本：跑完自动出「通过率」（关键词命中 + 是否编造就够，不要上 LLM 打分器）",
+        "week":  "W21"
+    },
+    {
+        "id":  "D145",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-26",
+        "task":  "两版各跑一遍，出第一组数字",
+        "week":  "W21"
+    },
+    {
+        "id":  "D146",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-27",
+        "task":  "把错例按类型归类（检索没找到 / 找到但没用 / 编了 / 答偏了）",
+        "week":  "W21"
+    },
+    {
+        "id":  "D147",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-28",
+        "task":  "复盘：哪一类错误最多，决定你下一步改哪里",
+        "week":  "W21"
+    },
+    {
+        "id":  "D148",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-29",
+        "task":  "汇总三维指标：通过率、单次成本、P95 延迟，做成一张表",
+        "week":  "W22"
+    },
+    {
+        "id":  "D149",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-30",
+        "task":  "针对最大一类错例，各优化一版（A 改检索策略，B 改工具描述）",
+        "week":  "W22"
+    },
+    {
+        "id":  "D150",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-31",
+        "task":  "重跑测试集，记录提升幅度（只改一处，观察单独影响——这是「能归因」的能力）",
+        "week":  "W22"
+    },
+    {
+        "id":  "D151",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-04-01",
+        "task":  "写《这个场景我选哪个方案，为什么》，用数字支撑，不用形容词；把结论 + 对比表写进 README",
+        "week":  "W22"
+    },
+    {
+        "id":  "D152",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-04-02",
+        "task":  "读《深入理解 AI Agent》第 1 章（循环与上下文管理）+ 上下文工程章节；对照你 M1 手写的 loop，看它在讲你已经做过的哪一步",
+        "week":  "W22"
+    },
+    {
+        "id":  "D153",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-04-03",
+        "task":  "用「原理语言」把 3 个项目各重述一遍（300 字/个，面试可直接用）",
+        "week":  "W22"
+    },
+    {
+        "id":  "D154",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-04-04",
+        "task":  "月复盘 + `git tag m5-done`：什么情况下 B（自主 Agent）反而更差？举出你自己的例子",
+        "week":  "W22"
+    },
+    {
+        "id":  "D155",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-05",
+        "task":  "3 个项目各写四段：问题 / 方案 / 取舍 / 数字（模板见附录E）",
+        "week":  "W23"
+    },
+    {
+        "id":  "D156",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-06",
+        "task":  "补硬数字：从日志里捞「连续运行天数、失败次数、平均耗时、总花费、通过率」",
+        "week":  "W23"
+    },
+    {
+        "id":  "D157",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-07",
+        "task":  "GitHub 整理：每个仓库 README 顶部加「一句话 + 截图 + 三条命令跑起来」",
+        "week":  "W23"
+    },
+    {
+        "id":  "D158",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-08",
+        "task":  "每个仓库加「已知限制」章节（写得出限制 = 真做过）",
+        "week":  "W23"
+    },
+    {
+        "id":  "D159",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-09",
+        "task":  "写 3 分钟口述版自我介绍（念出来，录音回放，删掉所有形容词）",
+        "week":  "W23"
+    },
+    {
+        "id":  "D160",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-10",
+        "task":  "简历终稿（一页），对照 W18 那 5 家的 JD 关键词改措辞",
+        "week":  "W23"
+    },
+    {
+        "id":  "D161",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-11",
+        "task":  "让 AI 扮面试官，只问项目细节，问 20 个问题，记录答不出的",
+        "week":  "W23"
+    },
+    {
+        "id":  "D162",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-12",
+        "task":  "做两版定向简历：① AI 应用开发 ② AI 交付/实施（同一批项目，换措辞与排序）",
+        "week":  "W24"
+    },
+    {
+        "id":  "D163",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-13",
+        "task":  "一页作品集（GitHub Pages 静态页即可）：3 个项目 + 对比表 + 联系方式",
+        "week":  "W24"
+    },
+    {
+        "id":  "D164",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-14",
+        "task":  "准备 20 个「项目会被追问」的问题，逐个写答案（为什么这么设计 / 为什么不用 X / 出过什么事故）",
+        "week":  "W24"
+    },
+    {
+        "id":  "D165",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-15",
+        "task":  "演练 1 分钟版 + 3 分钟版，各讲 5 遍",
+        "week":  "W24"
+    },
+    {
+        "id":  "D166",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-16",
+        "task":  "写一篇 1500 字技术笔记（选题：为什么我先手写 200 行原生 loop 才去看框架），发到掘金/知乎/CSDN 拿外链",
+        "week":  "W24"
+    },
+    {
+        "id":  "D167",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-17",
+        "task":  "全面自检：链接能打开、仓库能 clone、demo 能跑、README 无错字",
+        "week":  "W24"
+    },
+    {
+        "id":  "D168",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-18",
+        "task":  "复盘：简历里还有哪些句子是「形容词」而不是「事实」",
+        "week":  "W24"
+    },
+    {
+        "id":  "D169",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-19",
+        "task":  "列 40 个目标：中小公司 AI 应用 / 传统行业数字化 / AI 交付实施 / 外包岗；按回应概率排序",
+        "week":  "W25"
+    },
+    {
+        "id":  "D170",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-20",
+        "task":  "每天投 5 家，记录：公司 / 岗位 / JD 关键词 / 投递日 / 状态 / 是否内推",
+        "week":  "W25"
+    },
+    {
+        "id":  "D171",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-21",
+        "task":  "每天投 5 家，记录：公司 / 岗位 / JD 关键词 / 投递日 / 状态 / 是否内推",
+        "week":  "W25"
+    },
+    {
+        "id":  "D172",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-22",
+        "task":  "每天投 5 家，记录：公司 / 岗位 / JD 关键词 / 投递日 / 状态 / 是否内推",
+        "week":  "W25"
+    },
+    {
+        "id":  "D173",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-23",
+        "task":  "每天投 5 家，记录：公司 / 岗位 / JD 关键词 / 投递日 / 状态 / 是否内推",
+        "week":  "W25"
+    },
+    {
+        "id":  "D174",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-24",
+        "task":  "复盘：哪类 JD 回应率高？把简历措辞往那类 JD 的用词上靠",
+        "week":  "W25"
+    },
+    {
+        "id":  "D175",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-25",
+        "task":  "找内推（内推成功率是海投的 5–10 倍）：前同事、同学、GitHub 上聊过的人",
+        "week":  "W25"
+    },
+    {
+        "id":  "D176",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-26",
+        "task":  "每天投 3 家；每次面试后 24 小时内写《被问倒清单》（问题原文 + 我当时怎么答 + 正确答法）",
+        "week":  "W26"
+    },
+    {
+        "id":  "D177",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-27",
+        "task":  "每天投 3 家；每次面试后 24 小时内写《被问倒清单》（问题原文 + 我当时怎么答 + 正确答法）",
+        "week":  "W26"
+    },
+    {
+        "id":  "D178",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-28",
+        "task":  "每天投 3 家；每次面试后 24 小时内写《被问倒清单》（问题原文 + 我当时怎么答 + 正确答法）",
+        "week":  "W26"
+    },
+    {
+        "id":  "D179",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-29",
+        "task":  "每天投 3 家；每次面试后 24 小时内写《被问倒清单》（问题原文 + 我当时怎么答 + 正确答法）",
+        "week":  "W26"
+    },
+    {
+        "id":  "D180",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-30",
+        "task":  "每天投 3 家；每次面试后 24 小时内写《被问倒清单》（问题原文 + 我当时怎么答 + 正确答法）",
+        "week":  "W26"
+    },
+    {
+        "id":  "D181",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-01",
+        "task":  "每天投 3 家；每次面试后 24 小时内写《被问倒清单》（问题原文 + 我当时怎么答 + 正确答法）",
+        "week":  "W26"
+    },
+    {
+        "id":  "D182",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-02",
+        "task":  "复盘：统计被问最多的 3 个技术点",
+        "week":  "W26"
+    },
+    {
+        "id":  "D183",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-03",
+        "task":  "只补《被问倒清单》里出现 ≥2 次的知识点。一个点一天，学完立刻用它改一次自己的代码（否则等于没学）",
+        "week":  "W27"
+    },
+    {
+        "id":  "D184",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-04",
+        "task":  "只补《被问倒清单》里出现 ≥2 次的知识点。一个点一天，学完立刻用它改一次自己的代码（否则等于没学）",
+        "week":  "W27"
+    },
+    {
+        "id":  "D185",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-05",
+        "task":  "只补《被问倒清单》里出现 ≥2 次的知识点。一个点一天，学完立刻用它改一次自己的代码（否则等于没学）",
+        "week":  "W27"
+    },
+    {
+        "id":  "D186",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-06",
+        "task":  "只补《被问倒清单》里出现 ≥2 次的知识点。一个点一天，学完立刻用它改一次自己的代码（否则等于没学）",
+        "week":  "W27"
+    },
+    {
+        "id":  "D187",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-07",
+        "task":  "只补《被问倒清单》里出现 ≥2 次的知识点。一个点一天，学完立刻用它改一次自己的代码（否则等于没学）",
+        "week":  "W27"
+    },
+    {
+        "id":  "D188",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-08",
+        "task":  "写《8 个月从「只会指挥 AI」到交付 3 个项目》公开总结（这篇本身就是求职材料）",
+        "week":  "W27"
+    },
+    {
+        "id":  "D189",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-09",
+        "task":  "定下一步：继续找工作 / 接小外包 / 用项目②做一个有人付费的小工具",
+        "week":  "W27"
+    }
+];
+var PHASES={W0:'启动周',M1:'生成能力',M2:'骨架',M3:'项目①连续运行',M4:'上线+试投',M5:'判断力',M6:'求职冲刺'};
+var KEY='ygbuddy_v1';
+var SYKEY='ygbuddy_sync_v1';
+var DOW=['周日','周一','周二','周三','周四','周五','周六'];
+var CHECKPOINTS=[
+  {id:'D28',title:'检查点 1 · 关文件写 loop',fix:'60 分钟写不完 = 正常；完全写不出 = 回 W4 再来一周，M1 顺延。'},
+  {id:'D42',title:'检查点 2 · 40 分钟写出带工具+上限+错误回传的 loop',fix:'达不到就守住 M1 再练一周，不要进 M2。地基没浇完就上楼，后面全塌。'},
+  {id:'D105',title:'检查点 3 · 连续 14 天自动产出',fix:'不达标就砍掉项目② 和 M5 第二轮优化，M6 提前 3 周开始。'},
+  {id:'D133',title:'检查点 4 · 公网 URL + 5 家投递记录',fix:'有 URL 没投递 = 立刻补投；没 URL = 砍项目②，全部时间保上线。'},
+  {id:'D189',title:'终点 · 毕业验收',fix:'对着验收清单打勾，不达标就别称「学完」。'}
+];
+var FINAL=[
+  '关掉所有参考，40 分钟内从空文件写出带工具、带上限、带错误回传的 loop',
+  '3 个项目在 GitHub 上，README 能被陌生人照着跑起来',
+  '至少 1 个项目有公网可访问的地址',
+  '至少 1 个项目连续运行 ≥ 30 天',
+  '有一张量化对比表：固定流程 vs 自主 Agent（通过率 / 成本 / P95）',
+  '能不看稿讲清「这个场景为什么不该用 Agent」',
+  'git log --oneline 条目数 ≥ 170',
+  '投满 20 家，《被问倒清单》≥ 15 条',
+  '有 1 个真实用户（不是你自己）说过这个东西有用'
+];
+var DAILY_ITEMS=[
+  {k:'warm',n:'开机 10 分钟',d:'读昨天写的文件，只读不写'},
+  {k:'main',n:'主段 80 分钟',d:'手放键盘上，不看视频不查教程'},
+  {k:'note',n:'收尾 20 分钟',d:'写 3 行：做了什么 / 卡在哪 / 明天第一件事'},
+  {k:'commit',n:'最后 10 分钟',d:'git add . && git commit'}
+];
+
+/* ================= 题库（按阶段，人工可扩） ================= */
+var BANK={
+W0:[
+ {q:'执行 print("3" + 3) 会发生什么？',a:['输出 33','TypeError，字符串不能和数字相加','输出 6','报语法错误'],k:1,e:'str + int 会抛 TypeError。要拼接先 str(3)，要算数先 int("3")。'},
+ {q:'NameError 和 KeyError 的区别是？',a:['前者是变量名没定义，后者是字典里没这个键','两者完全一样','前者是语法错误','后者只在读文件时出现'],k:0,e:'NameError：名字不存在；KeyError：字典键不存在。看报错最后一行就能分开。'},
+ {q:'Python 里缩进写错，通常报什么错？',a:['IndentationError 或 SyntaxError','NameError','KeyError','TimeoutError'],k:0,e:'缩进错误在解析阶段就被拦下，报 IndentationError / SyntaxError，行号通常指向上一次缩进不对的那行。'},
+ {q:'list 和 dict 最核心的区别是？',a:['list 按位置取，dict 按键取','list 只能放数字','dict 不能存字符串','没有区别'],k:0,e:'a[0] 取位置；d["name"] 取键。工具调用的参数就是 dict 结构。'},
+ {q:'读代码报错的正确顺序是？',a:['从第一行往下逐行读','先看最后一行（错误类型+原因），再找报错里的行号和那一行代码','直接把整段删了重写','问 AI 要完整代码'],k:1,e:'traceback 从下往上读：最后一行给错误类型和原因，往上找你自己写的行号。'},
+ {q:'try/except 的作用是？',a:['让程序跑得更快','接住异常，避免整个程序崩掉','自动修复 bug','打印日志'],k:1,e:'把可能失败的操作包起来，失败时走 except 分支。Agent 里用来把错误变成一句话回传给模型。'},
+ {q:'f"共 {n} 条" 这种写法叫什么？',a:['字符串拼接','f-string 格式化','正则替换','模板引擎'],k:1,e:'f-string，Python 3.6+。比 "共 " + str(n) + " 条" 清楚得多。'},
+ {q:'一个函数没有 return，默认返回什么？',a:['0','空字符串','None','报错'],k:2,e:'返回 None。工具函数忘了 return，模型拿到的就是空值——这是新手最常见的坑之一。'},
+ {q:'pip install 装的东西装到哪里？',a:['项目文件夹','当前 Python 环境的 site-packages','系统桌面','浏览器'],k:1,e:'装进当前解释器对应的 site-packages。换解释器就找不到，所以要固定用一个 Python。'},
+ {q:'git commit 之前必须先做什么？',a:['git add 把改动放进暂存区','git push','重启电脑','删掉旧文件'],k:0,e:'工作区 → git add → 暂存区 → git commit → 本地仓库。少了 add 就是空提交。'}
+],
+M1:[
+ {q:'tool_calls 是模型返回的什么？',a:['真正的函数执行结果','模型「想调用哪个工具、传什么参数」的请求','HTTP 状态码','token 数'],k:1,e:'模型不会真执行函数，它只输出一个调用意图，执行是你代码干的。'},
+ {q:'为什么要把工具执行结果以 role=tool 追加进 messages？',a:['为了省 token','模型看不到结果就无法给出最终答案','为了日志好看','必须这样做否则报错'],k:1,e:'模型只能看到 messages 里的内容。不给结果，它就只能瞎猜或者重复调用。'},
+ {q:'循环里必须设置 max_steps 的原因是？',a:['让代码更短','防止模型反复调工具陷入死循环、烧钱','Python 要求','为了好看'],k:1,e:'没有上限的 loop 会一直调工具直到额度烧完。上限是安全阀。'},
+ {q:'把 tools 参数删掉会发生什么？',a:['模型照样能调工具','模型不知道自己有工具，只会直接回答','报语法错误','模型会反问你要工具'],k:1,e:'工具定义是通过 tools 参数进上下文的。删了，模型就不知道有这回事。'},
+ {q:'description 写得太模糊会怎样？',a:['没影响','模型容易选错工具或传错参数','模型会报错','token 会变多'],k:1,e:'description 是模型选工具的唯一依据。写得含糊，它就瞎选——这就是「工具设计」第一课。'},
+ {q:'temperature=0 通常意味着？',a:['输出更随机','尽量确定性输出，同样输入尽量同样结果','关闭模型','降低价格'],k:1,e:'做工具调用和结构化输出时用 0，减少随机性，方便复现问题。'},
+ {q:'工具函数抛异常没接住，会怎样？',a:['模型自动重试','整个程序崩掉，这一轮白跑','模型会道歉','没有影响'],k:1,e:'所以要把异常转成字符串塞回 role=tool，让模型看到「失败了，原因是 X」。'},
+ {q:'usage 字段里的 total_tokens 有什么用？',a:['算钱和判断上下文有没有超','只是装饰','决定模型速度','没用'],k:0,e:'第一天就盯成本：token × 单价 = 每次运行的花费。这也是 M5 对比表的指标之一。'},
+ {q:'同一个问题问两次，第二次回答不同，最可能的原因是？',a:['模型坏了','temperature 大于 0，采样有随机性','网络问题','代码写错了'],k:1,e:'默认温度下每次采样不同。要可复现就设 0，并记录 prompt 版本。'},
+ {q:'工具返回值应该给模型多少？',a:['原始 JSON 全塞进去','只给模型真正需要的字段，长的截断','什么都不给','给截图'],k:1,e:'返回越大越贵越容易跑偏。截断并注明「已截断」。'}
+],
+M2:[
+ {q:'「一个工具只做一件事」的好处是？',a:['代码更短','模型更容易选对，参数也更简单','运行更快','更省电'],k:1,e:'工具粒度越粗，模型越难判断该不该用、参数怎么填。拆细反而稳。'},
+ {q:'parameters 里写 enum 的作用是？',a:['限制取值只能是列出的几个','加快执行','加密参数','生成文档'],k:0,e:'enum 把「合法值只有 a/b/c」写进 schema，模型就不容易传错。'},
+ {q:'会话历史越长，最直接的问题是？',a:['越贵、越慢，还容易忘掉关键信息','模型会崩溃','无法保存','没有影响'],k:0,e:'上下文有预算。常见做法：保留 system + 最近 N 条，更早的压成摘要。'},
+ {q:'摘要式记忆的典型做法是？',a:['把旧对话删掉','把 10 轮以前的内容压成一段摘要塞回 system','换更大的模型','开新会话'],k:1,e:'压缩而不是删除，既省 token 又保住关键事实。'},
+ {q:'要求模型输出 JSON，最常见的问题是？',a:['模型会拒绝','偶尔夹带解释文字或多余逗号，导致 json.loads 失败','JSON 太长','无法输出中文'],k:1,e:'所以要容错：解析失败就把错误回传让它自己修，最多重试 2 次。'},
+ {q:'字段校验应该放在哪一步？',a:['直接入库，出错再说','解析后立刻校验（缺字段/类型错就打回重写）','前端校验','不用校验'],k:1,e:'脏数据往下流，会在很远的地方炸，且很难定位。入口就拦。'},
+ {q:'「一次合格率」这个指标衡量的是？',a:['模型智商','一批输入里第一次就产出合法结构化结果的比例','响应速度','价格'],k:1,e:'这是你能拿数字说话的第一个指标，M5 的对比基线。'},
+ {q:'工具报错里写「合法值只有 a/b/c」的意义是？',a:['好看','让模型能自己改正并重试，实现自愈','增加 token 收入','防止黑客'],k:1,e:'错误信息是给模型看的 prompt。写得可执行，它就能自我修复。'},
+ {q:'路由如果用写死的关键词规则，好处是？',a:['更智能','可预测、可调试、便宜','更难维护','不需要模型'],k:1,e:'规则路由在固定场景里比让模型决定更稳，这也是 M5 要对比的「版本 A」。'},
+ {q:'把配置写进 config.json 而不是代码里，主要为了？',a:['好看','换模型/改阈值不用改代码，也不容易把密钥提交上去','运行更快','减少依赖'],k:1,e:'配置与代码分离，是「能交付给别人」的第一步。'}
+],
+M3:[
+ {q:'抓取三个源，其中一个挂了，正确做法是？',a:['整个流程失败退出','跳过它并记录，其余照常出结果','重试到成功为止','静默忽略'],k:1,e:'单源降级 + 记录失败源，读者才知道缺了什么。'},
+ {q:'为什么抓取要设超时？',a:['省流量','避免一个慢源把整个流程卡死','符合规范','让日志好看'],k:1,e:'没有 timeout，一个不响应的源能让任务挂几十分钟。'},
+ {q:'中文乱码最常见的原因是？',a:['字体问题','用错了编码解码（GBK 当 UTF-8 解）','屏幕分辨率','网络慢'],k:1,e:'显式 decode("utf-8", errors="ignore")，必要时看响应头里的 charset。'},
+ {q:'并发抓取（线程池）主要改善什么？',a:['准确率','总耗时（IO 等待被重叠）','成本','代码可读性'],k:1,e:'网络请求大部分时间在等，并发把等待叠起来。30s 压到 10s 很常见。'},
+ {q:'日志里最该记的四样东西是？',a:['开始/结束时间、耗时、成功源数、花费','用户名、密码','全部原始 HTML','截图'],k:0,e:'出事时能在 30 秒内定位原因，靠的就是这几项。'},
+ {q:'定时任务在 Windows 上用命令行创建，正确的命令是？',a:['schtasks /Create ...','crontab -e','systemctl enable','任务管理器右键'],k:0,e:'schtasks /Create /TN 名称 /TR 程序 /SC DAILY /ST 08:30 /F。'},
+ {q:'「连续运行 14 天」这个事实为什么值钱？',a:['说明你熬得住','证明你处理了真实世界的不确定性：源改版、超时、额度、编码','因为数字大','因为难写'],k:1,e:'跑一次是 demo，跑 14 天是工程。面试官看的是后者。'},
+ {q:'去重时用 Jaccard 相似度的前提是？',a:['必须有向量库','先把文本切成词集合，再算交集/并集比例','需要 GPU','需要数据库'],k:1,e:'简易集合相似度就够用，不要为了去重上向量库。'},
+ {q:'推送失败时最应该做的是？',a:['静默失败','给自己发一条「我挂了」的通知','无限重试','关掉推送'],k:1,e:'失败可观测，比失败本身更重要。'},
+ {q:'每条摘要成本压到 1 分钱内，靠的是？',a:['换更贵的模型','批处理 + 限制输出长度 + 精简输入','减少数据源','降低准确率'],k:1,e:'成本和长度强相关。先砍长度，再谈模型。'}
+],
+M4:[
+ {q:'密钥绝对不能出现在哪里？',a:['环境变量','代码和 Git 仓库','系统设置','.env 文件（已 gitignore）'],k:1,e:'一旦提交进 Git，历史里永久留痕。.gitignore 要在第一天就建好。'},
+ {q:'「每日成本上限」比「限流」更重要的原因是？',a:['更好实现','限流防的是频率，成本上限防的是「被刷到破产」','成本上限更快','没区别'],k:1,e:'被扫到后最坏情况是额度烧光。先设预算，超了直接拒绝并返回人话。'},
+ {q:'公网服务加一个简单 token 的目的是？',a:['提升速度','防止被扫到后白嫖你的额度','符合法律','好看'],k:1,e:'公开 URL 几小时内就会被爬虫扫到。'},
+ {q:'Android 9+ 默认禁止明文 HTTP，需要在清单里加什么？',a:['android:usesCleartextTraffic="true"','INTERNET 权限就够','什么都不用加','android:debuggable'],k:0,e:'否则 http:// 请求直接被拦，表现为「网络错误」。'},
+ {q:'本地能跑但上线就崩，最常见的原因是？',a:['代码逻辑不同','环境差异：缺环境变量、路径写死、依赖没装','服务器太慢','浏览器版本'],k:1,e:'上线第一件事是把所有配置外置，并让启动失败时打印清楚缺什么。'},
+ {q:'让朋友试用后，最该记录的是？',a:['他的夸奖','他的原话，包括「这有什么用」','截图发朋友圈','访问量'],k:1,e:'原话里藏着真实需求，也是简历里「用户反馈」的来源。'},
+ {q:'存活监控最简单的实现是？',a:['盯着看','定时请求一个 /ping 接口，失败就通知自己','买监控服务','看日志'],k:1,e:'一个定时请求 + 一条通知，就能覆盖 90% 的挂掉场景。'},
+ {q:'部署时选免费容器的第一原则是？',a:['功能最全','最省事，先上线再优化','最便宜','最安全'],k:1,e:'上线会暴露你在密钥、并发、成本、崩溃上的所有无知，越早越好。'},
+ {q:'给接口加限流，超出时应该返回？',a:['200 加空数据','429 并说明原因','500','直接断开'],k:1,e:'429 Too Many Requests 是标准语义，客户端能识别。'},
+ {q:'README 里「已知限制」章节的作用是？',a:['显得谦虚','证明你真的跑过、知道边界在哪','合规要求','增加字数'],k:1,e:'写得出限制 = 真做过。面试官常从这里开始追问。'}
+],
+M5:[
+ {q:'固定流程（Workflow）相比自主 Agent 的优势是？',a:['更智能','可预测、可调试、便宜、延迟低','更酷','更容易写'],k:1,e:'源结构稳定的场景，自主决策只会增加不确定性。'},
+ {q:'自主 Agent 在什么情况下反而更差？',a:['数据源多且不稳定','任务步骤固定、数据源稳定时，它多花的调用纯属浪费','需要推理时','用户很多时'],k:1,e:'能用固定流程就别上 Agent。这句话是这套计划里最值钱的。'},
+ {q:'评测集里为什么要放「资料里没有答案」的题？',a:['凑数','考它会不会编造（幻觉）','提高难度','让分数好看'],k:1,e:'不测「该说不知道」的情况，你就不知道它有多爱编。'},
+ {q:'「答对」的定义必须满足什么？',a:['感觉答得好','可判定：必须含某个事实，或必须说「资料里没有」','字数够','语言通顺'],k:1,e:'不可判定的标准等于没有标准。'},
+ {q:'P95 延迟比平均延迟更有意义，因为？',a:['数字更大','它反映最慢那部分用户的体验','更容易算','平均值不准'],k:1,e:'平均值会被快的请求拉低，P95 才暴露长尾。'},
+ {q:'一次只改一个变量再重跑测试集，是为了？',a:['省时间','能归因：知道提升是哪一处改动带来的','符合流程','减少成本'],k:1,e:'同时改三处，涨了也不知道为什么涨。'},
+ {q:'为什么不用 LLM 当打分器来做第一版评测？',a:['太贵','不稳定且不可复现，先要一个你自己能解释的基线','太慢','不允许'],k:1,e:'关键词命中 + 是否编造，已经能给出可用的第一组数字。'},
+ {q:'「通过率 / 单次成本 / P95 延迟」三件套的作用是？',a:['写简历凑数','支撑「这个场景我选哪个方案」的判断','给老板看','没有作用'],k:1,e:'没有数字的取舍是形容词，有数字的取舍才是工程判断。'},
+ {q:'优化后提升幅度要记录，主要是因为？',a:['好看','证明改动有效，且能量化到面试里讲','必须写日志','防止回退'],k:1,e:'「改了什么 → 涨了多少」是最有说服力的一段叙述。'},
+ {q:'面试被问「为什么不用 Agent」，最好的回答结构是？',a:['Agent 太贵','先说场景特征（源稳定/步骤固定），再给数字对比，最后给结论','说不会','说没时间'],k:1,e:'场景 → 数字 → 结论，三段。'}
+],
+M6:[
+ {q:'简历里项目描述最该避免的是？',a:['数字太多','全是形容词和技术名词，没有取舍和数字','写得太短','用中文'],k:1,e:'「基于 X 构建了 Y，支持 Z」是零信息量。'},
+ {q:'「取舍」这一段为什么关键？',a:['显得谦虚','它证明你做过真实的决策，而不是照抄教程','凑字数','面试官爱听'],k:1,e:'准确率/成本/延迟三选二，选了哪个、为什么。'},
+ {q:'投递时「内推」的价值在于？',a:['显得有关系','绕过初筛，回应率通常是海投的 5-10 倍','更快','更便宜'],k:1,e:'所以找工作一半时间应该花在找人，而不是点投递。'},
+ {q:'每次面试后 24 小时内写《被问倒清单》，记什么？',a:['面试官态度','问题原文 + 我当时怎么答 + 正确答法','公司地址','薪资'],k:1,e:'只提取那一个点，不做情绪化复盘。'},
+ {q:'「只能补被问倒 ≥2 次的知识点」这条规则的意义是？',a:['偷懒','把有限时间花在真实缺口上，而不是泛泛补课','省钱','符合计划'],k:1,e:'面试驱动的学习效率最高。'},
+ {q:'作品集里最该放的是？',a:['截图','能点开的链接 + 一张量化对比表','代码行数','学习笔记'],k:1,e:'面试官会点链接。打不开的 demo 等于零。'},
+ {q:'口述自我介绍时删掉形容词的原因是？',a:['显得冷淡','形容词不提供信息，事实和数字才提供','时间不够','怕夸张'],k:1,e:'「我很努力」不如「连续跑了 47 天」。'},
+ {q:'面试官判断「这人是否真交付过」的依据通常是？',a:['学历','取舍和数字这两段','项目数量','证书'],k:1,e:'讲得出放弃了什么、跑出了什么数字，才是真做过。'},
+ {q:'遇到「你这个为什么不用 LangChain」这类问题，正确姿势是？',a:['辩解','说清你手写过 loop、知道抽象层下面是什么，并给出选择理由','承认不会','反问'],k:1,e:'手写过的人回答这类问题有底气，因为知道代价在哪。'},
+ {q:'第一份工作最该看重的是？',a:['薪资最高','能不能真的碰到交付：需求、上线、用户','公司大小','工位'],k:1,e:'交付经验才是下一份工作的筹码。'}
+]
+};
+
+/* ================= 存储 ================= */
+function loadJSON(k){ try{ return JSON.parse(localStorage.getItem(k))||{} }catch(e){ return {} } }
+function saveJSON(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); return true }catch(e){ toast('存储失败'); return false } }
+
+var S=loadJSON(KEY);
+if(!S.startDate) S.startDate='2026-10-27';
+if(!S.goal) S.goal=120;
+if(!S.logs) S.logs={};
+if(!S.cp) S.cp={};
+if(!S.fin) S.fin={};
+if(!S.quiz) S.quiz={};
+if(!S.setAt) S.setAt=Date.now();
+function save(){ S.setAt=S.setAt||Date.now(); saveJSON(KEY,S); }
+
+var SY=loadJSON(SYKEY);
+if(!SY.url) SY.url='';
+if(!SY.user) SY.user='';
+if(!SY.token) SY.token='';
+if(!SY.rev) SY.rev=0;
+if(!SY.last) SY.last=0;
+if(SY.auto===undefined) SY.auto=true;
+function saveSY(){ saveJSON(SYKEY,SY); }
+
+/* ================= 日期 ================= */
+function pd(s){ var p=String(s).split('-'); return new Date(+p[0],+p[1]-1,+p[2]); }
+function ymd(d){ var m=d.getMonth()+1,dd=d.getDate(); return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(dd<10?'0':'')+dd; }
+function addD(d,n){ var x=new Date(d.getTime()); x.setDate(x.getDate()+n); return x; }
+function todayD(){ var n=new Date(); return new Date(n.getFullYear(),n.getMonth(),n.getDate()); }
+function fmtCN(d){ return (d.getMonth()+1)+'月'+d.getDate()+'日'; }
+function diffD(a,b){ return Math.round((a.getTime()-b.getTime())/86400000); }
+var START=pd(S.startDate);
+function idxOfDate(dt){ return diffD(dt,START); }
+function dateOfIdx(i){ return addD(START,i); }
+function todayIdx(){ return idxOfDate(todayD()); }
+
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtTask(t){
+  var s=String(t==null?'':t).replace(/<br\s*\/?>/gi,'\n');
+  s=esc(s).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\n/g,'<span class="brk"></span>');
+  return s;
+}
+function shortText(t,n){
+  var s=String(t||'').replace(/<br\s*\/?>/gi,' ').replace(/`/g,'').replace(/\s+/g,' ');
+  return s.length>n?s.slice(0,n)+'…':s;
+}
+function el(id){ return document.getElementById(id); }
+var toastTimer=null;
+function toast(m){ var t=el('toast'); t.textContent=m; t.className='toast on';
+  clearTimeout(toastTimer); toastTimer=setTimeout(function(){ t.className='toast'; },1900); }
+
+/* ================= 记录 ================= */
+function logOf(k){ if(!S.logs[k]) S.logs[k]={done:{},minutes:0,blocks:[],note:'',hash:'',at:0}; return S.logs[k]; }
+function isDone(lg){ return !!(lg&&lg.done&&lg.done.warm&&lg.done.main&&lg.done.note&&lg.done.commit); }
+function doneCount(lg){ if(!lg||!lg.done) return 0; var c=0; var ks=['warm','main','note','commit'];
+  for(var i=0;i<ks.length;i++){ if(lg.done[ks[i]]) c++; } return c; }
+function touch(lg){ lg.at=Date.now(); S.setAt=Date.now(); }
+
+function streak(){
+  var t=todayIdx(); var start=t;
+  if(t<0) return 0;
+  if(t>=DAYS.length) start=DAYS.length-1;
+  var lgT=S.logs[ymd(dateOfIdx(t))];
+  if(!isDone(lgT)) start=t-1;
+  var n=0;
+  for(var i=start;i>=0;i--){ if(isDone(S.logs[ymd(dateOfIdx(i))])) n++; else break; }
+  return n;
+}
+function bestStreak(){
+  var best=0,cur=0;
+  for(var i=0;i<DAYS.length;i++){
+    if(isDone(S.logs[ymd(dateOfIdx(i))])){ cur++; if(cur>best) best=cur; } else cur=0;
+  }
+  return best;
+}
+
+/* ================= 同步 ================= */
+var pushTimer=null, syncing=false;
+function apiBase(){ var u=(SY.url||'').trim().replace(/\/+$/,''); return u; }
+function api(path,method,body){
+  var url=apiBase()+path;
+  var opts={method:method||'GET',headers:{'Content-Type':'application/json'}};
+  if(SY.token) opts.headers['Authorization']='Bearer '+SY.token;
+  if(body) opts.body=JSON.stringify(body);
+  return fetch(url,opts).then(function(r){
+    return r.json().catch(function(){ return {}; }).then(function(j){
+      if(!r.ok){ var msg=j.error||('HTTP '+r.status); var err=new Error(msg); err.status=r.status; throw err; }
+      return j;
+    });
+  });
+}
+function syncSetStatus(txt,cls){
+  var n=el('syncdot'); if(n) n.className='dot '+(cls||'');
+  var s=el('synstate') || el('syntxt'); if(s) s.textContent=txt;
+}
+function authCall(path,payload){
+  if(!apiBase()){ return Promise.reject(new Error('服务地址没填')); }
+  return api(path,'POST',payload).then(function(j){
+    // 换账号时清掉本机旧数据，避免串号
+    if(SY.user && j.username && SY.user!==j.username){
+      S={startDate:S.startDate,goal:S.goal,setAt:Date.now(),logs:{},cp:{},fin:{},quiz:{}};
+    }
+    SY.token=j.token; SY.user=j.username; SY.rev=j.rev; SY.last=Date.now(); saveSY();
+    var empty=true;
+    if(j.state){
+      for(var k in j.state){ if(k!=='startDate'&&k!=='goal'&&k!=='setAt'){ empty=false; break; } }
+    }
+    if(empty){
+      // 服务端还没有数据：把本机进度推上去
+      adoptRemote(S);
+      syncPush();
+    } else {
+      adoptRemote(j.state);
+    }
+    return j;
+  });
+}
+function authLogin(name,pwd){ return authCall('/api/login',{username:name,password:pwd}); }
+function authRegister(name,pwd){ return authCall('/api/register',{username:name,password:pwd}); }
+function adoptRemote(remote){
+  if(!remote) return;
+  var merged=deepMerge(S,remote);
+  S=merged;
+  if(!S.logs) S.logs={}; if(!S.cp) S.cp={}; if(!S.fin) S.fin={}; if(!S.quiz) S.quiz={};
+  saveJSON(KEY,S);
+  renderHdr(); go(TAB);
+}
+function atOf(o){ if(!o||typeof o!=='object') return 0; return +o.at||0; }
+function deepMerge(a,b){
+  var out={};
+  for(var k in a) out[k]=a[k];
+  for(var k2 in b) out[k2]=b[k2];
+  ['logs','cp','fin','quiz'].forEach(function(f){
+    var x=a[f]||{}, y=b[f]||{}, m={};
+    var keys={}; for(var kk in x) keys[kk]=1; for(var kk2 in y) keys[kk2]=1;
+    for(var kk3 in keys){
+      var p=x[kk3], q=y[kk3];
+      if(p===undefined){ m[kk3]=q; }
+      else if(q===undefined){ m[kk3]=p; }
+      else if(typeof p==='object'&&typeof q==='object'&&p&&q&&(p.at!==undefined||q.at!==undefined)){
+        m[kk3]=atOf(q)>=atOf(p)?q:p;
+      } else if(typeof p==='object'&&typeof q==='object'&&p&&q){
+        var sub={}; var sks={};
+        for(var s1 in p) sks[s1]=1; for(var s2 in q) sks[s2]=1;
+        for(var s3 in sks){
+          var u=p[s3],v=q[s3];
+          if(u===undefined) sub[s3]=v; else if(v===undefined) sub[s3]=u;
+          else sub[s3]=atOf(v)>=atOf(u)?v:u;
+        }
+        m[kk3]=sub;
+      } else { m[kk3]=q; }
+    }
+    out[f]=m;
+  });
+  out.startDate = (S.setAt||0) >= (b.setAt||0) ? a.startDate : b.startDate;
+  out.goal = (S.setAt||0) >= (b.setAt||0) ? a.goal : b.goal;
+  out.setAt = Math.max(a.setAt||0,b.setAt||0);
+  return out;
+}
+function syncPush(){
+  if(!SY.token||!apiBase()) return Promise.resolve(false);
+  if(syncing) return Promise.resolve(false);
+  syncing=true;
+  syncSetStatus('同步中…','');
+  return api('/api/state','POST',{state:S,rev:SY.rev}).then(function(j){
+    SY.rev=j.rev; SY.last=Date.now(); saveSY();
+    adoptRemote(j.state);
+    syncSetStatus('已同步','on');
+    syncing=false; return true;
+  }).catch(function(e){
+    syncing=false;
+    if(e && e.status===401){ authExpired(); return false; }
+    syncSetStatus('同步失败，稍后重试','err'); return false;
+  });
+}
+function authExpired(){
+  SY.token=''; SY.rev=0; saveSY();
+  syncSetStatus('登录已失效','err');
+  renderHdr();
+  toast('登录已失效，请重新登录');
+  showAuth();
+}
+function syncPull(){
+  if(!SY.token||!apiBase()) return Promise.resolve(false);
+  return api('/api/state','GET').then(function(j){
+    SY.rev=j.rev; SY.last=Date.now(); saveSY();
+    adoptRemote(j.state);
+    syncSetStatus('已同步','on');
+    return true;
+  }).catch(function(){ syncSetStatus('离线','err'); return false; });
+}
+function schedulePush(){
+  if(!SY.token||!apiBase()) return;
+  clearTimeout(pushTimer);
+  pushTimer=setTimeout(function(){ syncPush(); },1200);
+}
+function fmtAgo(t){ if(!t) return '从未';
+  var d=Math.floor((Date.now()-t)/1000);
+  if(d<60) return d+' 秒前';
+  if(d<3600) return Math.floor(d/60)+' 分钟前';
+  return Math.floor(d/3600)+' 小时前';
+}
+
+/* ================= 顶部 ================= */
+function renderHdr(){
+  var t=todayIdx(), h='';
+  if(t<0){
+    h='<div class="hdr-row"><h1>还没开始</h1><span class="badge">W0 待启动</span></div>'+
+      '<div class="sub">计划从 '+S.startDate+' 开始</div>';
+  } else if(t>=DAYS.length){
+    h='<div class="hdr-row"><h1>计划已结束</h1><span class="badge ok">D'+DAYS.length+'</span></div>'+
+      '<div class="sub">'+S.startDate+' 起已满 '+(t+1)+' 天</div>';
+  } else {
+    var d=DAYS[t], lg=S.logs[ymd(todayD())], st=streak();
+    h='<div class="hdr-row"><h1>'+d.id+' · '+PHASES[d.phase]+'</h1>'+
+      (isDone(lg)?'<span class="badge ok">今日已完成</span>':'<span class="badge warn">待打卡</span>')+
+      (SY.token?'<span class="badge dim">已同步</span>':'<span class="badge dim">本机</span>')+
+      '</div>'+
+      '<div class="sub">'+ymd(todayD())+' '+DOW[todayD().getDay()]+' · 第 '+(t+1)+' / '+DAYS.length+' 天'+
+      (st>0?' · 连续 '+st+' 天':'')+'</div>';
+  }
+  el('hdr').innerHTML=h;
+}
+
+/* ================= 今天 ================= */
+function renderToday(){
+  var t=todayIdx();
+  if(t<0){
+    el('view').innerHTML='<div class="card"><div class="empty">计划从 '+S.startDate+' 开始。<br>到「我的」里把起始日期改成今天。</div></div>';
+    return;
+  }
+  if(t>=DAYS.length){
+    el('view').innerHTML='<div class="card"><h2>计划跑完了</h2><div class="small">共 '+DAYS.length+' 天。去「我的 → 验收」对一遍清单。</div></div>';
+    return;
+  }
+  var d=DAYS[t], k=ymd(todayD()), lg=logOf(k), dow=todayD().getDay();
+  var n=doneCount(lg), pct=Math.round(n/4*100);
+  var html='';
+
+  var tips=[];
+  if(dow===6) tips.push('今天周六 = <b>AI 禁言日</b>：只准查报错原文、官方文档、自己的 print。');
+  if(dow===0) tips.push('今天周日 = <b>重写日</b>：关掉参考，把本周代码从零重写一遍。');
+  for(var ci=0;ci<CHECKPOINTS.length;ci++){
+    if(CHECKPOINTS[ci].id===d.id) tips.push('今天是 <b>'+CHECKPOINTS[ci].title+'</b> 的验收日。');
+  }
+  if(!SY.token) tips.push('还没登录同步：换台电脑打开就看不到这里的进度。去「我的」填同步码。');
+  if(tips.length) html+='<div class="tips'+(SY.token?'':' blue')+'">'+tips.join('<br>')+'</div>';
+  if(!isDone(lg)&&dow!==0&&dow!==6&&todayD().getHours()>=21){
+    html+='<div class="tips red">已经 '+todayD().getHours()+' 点了，今天还没完成。别补天数——砍一个加分项，把交付物保住。</div>';
+  }
+
+  html+='<div class="card"><h2>今天的主任务 · '+(d.week?d.week+' · ':'')+d.phase+' · '+d.phaseName+'</h2>'+
+    '<div class="task">'+fmtTask(d.task)+'</div>';
+  if(d.flag) html+='<div class="flag"><b>完成标志：</b>'+fmtTask(d.flag)+'</div>';
+  html+='<div class="tags"><span class="badge">'+d.id+'</span>'+
+    (dow===6?'<span class="badge warn">AI 禁言</span>':'')+
+    (dow===0?'<span class="badge">重写日</span>':'')+
+    '</div></div>';
+
+  /* 电脑端：代码任务区 */
+  html+='<div class="card"><h2>代码任务 · 四段打卡 · '+n+'/4</h2>'+
+    '<div class="bar"><i style="width:'+pct+'%"></i></div>';
+  for(var i=0;i<DAILY_ITEMS.length;i++){
+    var it=DAILY_ITEMS[i], on=lg.done[it.k]?true:false;
+    html+='<div class="row" onclick="toggleItem(\''+it.k+'\')">'+
+      '<div class="txt"><div class="t1">'+it.n+'</div><div class="t2">'+it.d+'</div></div>'+
+      '<div class="chk '+(on?'on':'')+'">✓</div></div>';
+  }
+  html+='<div class="mt12"><input type="text" id="hash" placeholder="commit 短哈希 / 一句话说明（选填）" value="'+esc(lg.hash||'')+'">'+
+    '<button class="btn block mt8" onclick="saveHash()">记下今天的产出</button></div>';
+  html+='<div class="btn-row"><button class="btn pri" onclick="completeAll()">一键完成今天</button>'+
+    '<button class="btn ghost" onclick="clearToday()">清空</button></div></div>';
+
+  /* 手机端：答题入口 */
+  var qs=todayQuiz(), qsDone=quizDoneCount(k);
+  html+='<div class="card"><h2>今日 3 题</h2>'+
+    '<div class="small">已答 '+qsDone+' / 3'+(qsDone>=3?' · 答对 '+quizScore(k)+' 题':'')+'</div>'+
+    '<button class="btn blue block mt8" onclick="go(\'quiz\')">'+(qsDone>=3?'查看今日答题':'去答题')+'</button></div>';
+
+  html+='<div class="card"><h2>实际投入（分钟）</h2>'+
+    '<div style="display:flex;gap:8px;align-items:center">'+
+    '<input type="text" inputmode="numeric" id="mins" value="'+(lg.minutes||S.goal)+'" style="flex:1">'+
+    '<button class="btn blue" onclick="saveMins()">记录</button></div>'+
+    '<div class="small mt8">目标 '+S.goal+' 分钟。跑不动就去「我的」切 60 分钟降级。</div></div>';
+
+  html+='<div class="card"><h2>今天卡在哪（写一句就够）</h2>'+
+    '<textarea id="blk" placeholder="例：加成本统计时 token 算成了字符串，用 int() 转一下才对"></textarea>'+
+    '<button class="btn block mt8" onclick="addBlock()">记一条卡点</button>';
+  if(lg.blocks&&lg.blocks.length){
+    for(var b=0;b<lg.blocks.length;b++){
+      html+='<div class="block-item"><span class="x" onclick="delBlock('+b+')">✕</span><span class="bt">'+esc(lg.blocks[b])+'</span></div>';
+    }
+  } else { html+='<div class="empty">还没有记录。卡住超过 20 分钟就该写一条。</div>'; }
+  html+='</div>';
+
+  html+='<div class="card"><h2>明天 / 后天</h2>';
+  for(var j=1;j<=2;j++){
+    var nx=DAYS[t+j]; if(!nx) break;
+    html+='<div class="row"><div class="txt"><div class="t1">'+nx.id+' · '+fmtCN(dateOfIdx(t+j))+'</div>'+
+      '<div class="t2">'+esc(shortText(nx.task,42))+'</div></div></div>';
+  }
+  html+='</div>';
+
+  el('view').innerHTML=html;
+}
+
+/* ================= 答题 ================= */
+function todayQuiz(){
+  var t=todayIdx(); if(t<0||t>=DAYS.length) return [];
+  var ph=DAYS[t].phase, pool=BANK[ph]||BANK.M1, out=[];
+  for(var k=0;k<3;k++){
+    var idx=(t*3+k)%pool.length;
+    out.push({qid:ph+'_'+idx, ph:ph, item:pool[idx]});
+  }
+  return out;
+}
+function qrec(date,qid){ if(!S.quiz[date]) S.quiz[date]={}; return S.quiz[date][qid]; }
+function quizDoneCount(date){ if(!S.quiz[date]) return 0; return Object.keys(S.quiz[date]).length; }
+function quizScore(date){ var n=0; if(!S.quiz[date]) return 0;
+  for(var k in S.quiz[date]){ if(S.quiz[date][k].ok) n++; } return n; }
+
+function renderQuiz(){
+  var t=todayIdx();
+  if(t<0||t>=DAYS.length){ el('view').innerHTML='<div class="card"><div class="empty">计划未开始或已结束。</div></div>'; return; }
+  var k=ymd(todayD()), qs=todayQuiz(), d=DAYS[t];
+  var done=quizDoneCount(k);
+  var html='<div class="card"><h2>'+d.id+' · '+d.phase+' 阶段 · '+fmtCN(todayD())+'</h2>'+
+    '<div class="small">已答 '+done+'/3 · 答对 '+quizScore(k)+' 题'+(done>=3?' · 今天完成了':'')+'</div>'+
+    '<div class="bar mt8"><i style="width:'+Math.round(done/3*100)+'%"></i></div></div>';
+
+  for(var i=0;i<qs.length;i++){
+    var q=qs[i], rec=qrec(k,q.qid);
+    html+='<div class="card"><div class="q"><b>'+(i+1)+'.</b> '+esc(q.item.q)+'</div>';
+    if(rec){
+      for(var j=0;j<q.item.a.length;j++){
+        var cls='opt';
+        if(j===q.item.k) cls+=' right';
+        else if(rec.pick===j) cls+=' wrong';
+        html+='<div class="'+cls+'"><span class="oi '+(j===q.item.k?'right':(rec.pick===j?'wrong':''))+'">'+
+          String.fromCharCode(65+j)+'</span><span>'+esc(q.item.a[j])+'</span></div>';
+      }
+      html+='<div class="expl"><b>'+(rec.ok?'答对':'答错')+'：</b>'+esc(q.item.e)+'</div>';
+    } else {
+      for(var j2=0;j2<q.item.a.length;j2++){
+        html+='<div class="opt" onclick="answer(\''+q.qid+'\','+j2+')">'+
+          '<span class="oi">'+String.fromCharCode(65+j2)+'</span><span>'+esc(q.item.a[j2])+'</span></div>';
+      }
+    }
+    html+='</div>';
+  }
+  html+='<div class="card"><h2>规则</h2><div class="small">每天 3 题，按当天所处阶段出题（阶段推进，题目就换）。<br>'+
+    '答完立刻给解释；答案存在本机，登录同步后电脑端也能看到。<br>'+
+    '答对不等于学会——真正的验收在「检查点」那 4 天。</div></div>';
+  el('view').innerHTML=html;
+}
+function answer(qid,pick){
+  var k=ymd(todayD()), qs=todayQuiz(), item=null;
+  for(var i=0;i<qs.length;i++){ if(qs[i].qid===qid) item=qs[i].item; }
+  if(!item) return;
+  if(!S.quiz[k]) S.quiz[k]={};
+  S.quiz[k][qid]={ok:pick===item.k?1:0,pick:pick,at:Date.now()};
+  S.setAt=Date.now();
+  save(); schedulePush(); renderQuiz();
+  var done=quizDoneCount(k);
+  if(done>=3) toast('今日 3 题完成，答对 '+quizScore(k)+' 题');
+}
+
+/* ================= 交互 ================= */
+function toggleItem(kk){
+  var key=ymd(todayD()), lg=logOf(key);
+  lg.done[kk]=lg.done[kk]?0:1; touch(lg); save(); schedulePush();
+  renderToday(); renderHdr();
+  if(isDone(lg)) toast('今天完成了，连续 '+streak()+' 天');
+}
+function completeAll(){
+  var key=ymd(todayD()), lg=logOf(key);
+  lg.done={warm:1,main:1,note:1,commit:1};
+  if(!lg.minutes) lg.minutes=S.goal;
+  touch(lg); save(); schedulePush(); renderToday(); renderHdr(); toast('已标记完成');
+}
+function clearToday(){ var lg=logOf(ymd(todayD())); lg.done={}; touch(lg); save(); schedulePush(); renderToday(); renderHdr(); }
+function saveMins(){
+  var v=parseInt(el('mins').value,10); if(isNaN(v)||v<0) v=0;
+  var lg=logOf(ymd(todayD())); lg.minutes=v; touch(lg); save(); schedulePush(); toast('已记录 '+v+' 分钟');
+}
+function saveHash(){
+  var v=(el('hash').value||'').trim();
+  var lg=logOf(ymd(todayD())); lg.hash=v; touch(lg); save(); schedulePush(); toast(v?'已记下':'已清空');
+}
+function addBlock(){
+  var ta=el('blk'), v=(ta.value||'').trim(); if(!v){ toast('先写一句'); return; }
+  var lg=logOf(ymd(todayD())); if(!lg.blocks) lg.blocks=[];
+  lg.blocks.push(v); touch(lg); save(); schedulePush(); renderToday(); toast('已记录');
+}
+function delBlock(i){ var lg=logOf(ymd(todayD())); lg.blocks.splice(i,1); touch(lg); save(); schedulePush(); renderToday(); }
+
+/* ================= 进度 ================= */
+function renderProg(){
+  var t=todayIdx(), passed=Math.max(0,Math.min(DAYS.length,t+1)), doneN=0,minutes=0,blocks=0,qn=0,qok=0;
+  for(var i=0;i<DAYS.length;i++){
+    var lg=S.logs[ymd(dateOfIdx(i))];
+    if(isDone(lg)) doneN++;
+    if(lg&&lg.minutes) minutes+=lg.minutes;
+    if(lg&&lg.blocks) blocks+=lg.blocks.length;
+  }
+  for(var dk in S.quiz){ for(var q in S.quiz[dk]){ qn++; if(S.quiz[dk][q].ok) qok++; } }
+  var html='<div class="card"><h2>总进度</h2><div class="bar"><i style="width:'+Math.round(doneN/DAYS.length*100)+'%"></i></div>'+
+    '<div class="small mt8">完成 '+doneN+' / '+DAYS.length+' 天 · 已过 '+passed+' 天 · 完成率 '+
+    (passed?Math.round(doneN/passed*100):0)+'%</div></div>';
+
+  html+='<div class="card"><h2>数字</h2><div class="kpi">'+
+    '<div class="k"><b>'+streak()+'</b><span>当前连续（天）</span></div>'+
+    '<div class="k"><b>'+bestStreak()+'</b><span>最长连续（天）</span></div>'+
+    '<div class="k"><b>'+Math.round(minutes/60*10)/10+'</b><span>累计小时</span></div>'+
+    '<div class="k"><b>'+qn+'</b><span>答题数（对 '+qok+'）</span></div>'+
+    '</div></div>';
+
+  html+='<div class="card"><h2>阶段</h2>';
+  var order=['W0','M1','M2','M3','M4','M5','M6'];
+  for(var p=0;p<order.length;p++){
+    var ph=order[p],tot=0,dn=0;
+    for(var i2=0;i2<DAYS.length;i2++){ if(DAYS[i2].phase===ph){ tot++; if(isDone(S.logs[ymd(dateOfIdx(i2))])) dn++; } }
+    if(!tot) continue;
+    html+='<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:13px">'+
+      '<span>'+ph+' · '+PHASES[ph]+'</span><span class="small">'+dn+'/'+tot+'</span></div>'+
+      '<div class="bar mt8 blue"><i style="width:'+Math.round(dn/tot*100)+'%"></i></div></div>';
+  }
+  html+='</div>';
+
+  html+='<div class="card"><h2>全部 '+DAYS.length+' 天</h2>';
+  var s0=dateOfIdx(0), offset=(s0.getDay()+6)%7, cells='';
+  for(var z=0;z<offset;z++) cells+='<div class="hm off"></div>';
+  for(var i3=0;i3<DAYS.length;i3++){
+    var dt=dateOfIdx(i3), lg2=S.logs[ymd(dt)], cls='hm';
+    if(isDone(lg2)) cls+=' done';
+    else if(lg2&&doneCount(lg2)>0) cls+=' half';
+    else if(i3<=t) cls+=' miss';
+    if(i3===t) cls+=' today';
+    cells+='<div class="'+cls+'" onclick="jumpDay('+i3+')"></div>';
+  }
+  html+=cells+'</div>';
+  html+='<div class="legend"><span><i style="background:#3ddc97"></i>完成</span>'+
+    '<span><i style="background:#2b6a52"></i>部分</span><span><i style="background:#3a2020"></i>漏了</span>'+
+    '<span><i style="background:#1a222c"></i>未到</span></div>';
+
+  html+='<div class="card mt12"><h2>补记 / 查看某天</h2>'+
+    '<input type="date" id="jd" value="'+ymd(todayD())+'">'+
+    '<button class="btn block mt8" onclick="jumpByDate()">打开这一天</button></div>';
+  el('view').innerHTML=html;
+}
+function jumpDay(i){
+  var dt=dateOfIdx(i), k=ymd(dt), d=DAYS[i], lg=S.logs[k]||{done:{}}, done=isDone(lg);
+  var html='<div class="card"><h2>'+d.id+' · '+k+' '+DOW[dt.getDay()]+'</h2>'+
+    '<div class="task">'+fmtTask(d.task)+'</div>'+
+    (d.flag?'<div class="flag"><b>完成标志：</b>'+fmtTask(d.flag)+'</div>':'')+'</div>'+
+    '<div class="card"><h2>这一天</h2><div class="small">状态：'+(done?'已完成':'未完成')+' · 用了 '+(lg.minutes||0)+' 分钟'+
+    (lg.blocks&&lg.blocks.length?' · '+lg.blocks.length+' 条卡点':'')+(lg.hash?' · '+esc(lg.hash):'')+'</div>'+
+    '<div class="btn-row"><button class="btn pri" onclick="markDay('+i+',1)">标记完成</button>'+
+    '<button class="btn ghost" onclick="markDay('+i+',0)">标记未完成</button></div>'+
+    '<button class="btn ghost block mt8" onclick="go(\'today\')">返回</button></div>';
+  el('view').innerHTML=html;
+}
+function markDay(i,v){
+  var k=ymd(dateOfIdx(i)), lg=logOf(k);
+  if(v){ lg.done={warm:1,main:1,note:1,commit:1}; if(!lg.minutes) lg.minutes=S.goal; }
+  else { lg.done={}; }
+  touch(lg); save(); schedulePush(); go('prog'); toast(v?'已标记完成':'已标记未完成');
+}
+function jumpByDate(){
+  var v=el('jd').value; if(!v) return;
+  var i=idxOfDate(pd(v));
+  if(i<0||i>=DAYS.length){ toast('不在计划范围内'); return; }
+  jumpDay(i);
+}
+
+/* ================= 检查点 ================= */
+function renderCp(){
+  var t=todayIdx();
+  var html='<div class="card cpi"><h2>四个检查点 + 终点</h2><div class="small">到点判定，不合格就按下面的办法砍，别硬扛。</div></div>';
+  for(var i=0;i<CHECKPOINTS.length;i++){
+    var c=CHECKPOINTS[i], idx=-1;
+    for(var j=0;j<DAYS.length;j++){ if(DAYS[j].id===c.id){ idx=j; break; } }
+    if(idx<0) continue;
+    var dt=dateOfIdx(idx), left=diffD(dt,todayD()), st=S.cp[c.id], cls=st==='pass'?'cp pass':(st==='fail'?'cp fail':'cp');
+    var stv=st&&st.v?st.v:null;
+    html+='<div class="card '+cls+'"><h3>'+c.title+'</h3>'+
+      '<div class="d">'+c.id+' · '+ymd(dt)+' · '+(left>0?'还有 '+left+' 天':(left===0?'就是今天':'已过 '+(-left)+' 天'))+'</div>'+
+      '<div class="small">'+(stv==='pass'?'已通过':(stv==='fail'?'未通过，已按补救方案调整':'尚未判定'))+'</div>'+
+      '<div class="fix"><b>不达标怎么办：</b>'+c.fix+'</div>'+
+      '<div class="btn-row"><button class="btn '+(stv==='pass'?'pri':'ghost')+'" onclick="setCp(\''+c.id+'\',\'pass\')">通过</button>'+
+      '<button class="btn ghost" onclick="setCp(\''+c.id+'\',\'fail\')">未通过</button></div></div>';
+  }
+  el('view').innerHTML=html;
+}
+function setCp(id,v){ S.cp[id]={v:v,at:Date.now()}; S.setAt=Date.now(); save(); schedulePush(); renderCp(); toast(v==='pass'?'记下：通过':'记下：未通过，按补救方案走'); }
+
+/* ================= 我的 ================= */
+function renderMe(){
+  var html='';
+  /* 账号 */
+  html+='<div class="card"><h2>账号</h2>'+
+    '<div class="syncbar"><span class="dot '+(SY.token?'on':'')+'" id="syncdot"></span>'+
+    '<span id="syntxt">'+(SY.token?('已登录 · <b>'+esc(SY.user||'')+'</b>'):'离线模式（数据只存这台电脑）')+'</span><span id="synstate" class="small"></span></div>'+
+    '<div class="small mt8">服务：'+esc(SY.url||'未设置')+' · 上次同步：'+fmtAgo(SY.last)+' · 自动同步 '+(SY.auto?'开':'关')+'</div>'+
+    '<div class="btn-row mt8"><button class="btn ghost" onclick="doSync()">立即同步</button>'+
+    (SY.token
+      ? '<button class="btn ghost" id="logoutbtn" onclick="doLogout()">退出登录</button>'
+      : '<button class="btn pri" onclick="showAuth()">登录 / 注册</button>')+'</div>'+
+    '<button class="btn ghost block mt8" onclick="doWechat()" id="wxbtn" style="display:none">微信扫码登录</button>'+
+    '<div class="small mt8">每个账号的进度是独立的，换个人登录看到的是他自己的记录。</div>'+
+    '</div>';
+
+  /* 设置 */
+  html+='<div class="card"><h2>计划设置</h2>'+
+    '<label class="small">起始日期</label><input type="date" id="sd" value="'+S.startDate+'">'+
+    '<button class="btn block mt8" onclick="saveStart()">保存（整体平移所有日期）</button>'+
+    '<label class="small" style="display:block;margin-top:12px">每日目标</label>'+
+    '<select id="gl" onchange="saveGoal()">'+
+    '<option value="120"'+(S.goal===120?' selected':'')+'>120 分钟（标准）</option>'+
+    '<option value="60"'+(S.goal===60?' selected':'')+'>60 分钟（降级）</option>'+
+    '</select></div>';
+
+  /* 每日提醒（仅安卓 App） */
+  if(typeof Android!=='undefined' && Android && Android.setReminder){
+    var rt=localStorage.getItem('ygbuddy_rt')||'08:30';
+    html+='<div class="card"><h2>每日提醒</h2><input type="time" id="rt" value="'+rt+'">'+
+      '<button class="btn block mt8" onclick="setReminderNative()">设置每天提醒</button>'+
+      '<div class="small mt8">到点弹通知：今天的主任务 + 3 道题。需要在系统里允许本应用发通知。</div></div>';
+  }
+
+  /* 验收 */
+  var c=0; for(var k in S.fin){ if(S.fin[k]&&S.fin[k].v) c++; }  html+='<div class="card w2"><h2>毕业验收 · '+c+'/'+FINAL.length+'</h2>';
+  for(var i=0;i<FINAL.length;i++){
+    var on=S.fin[i]&&S.fin[i].v;
+    html+='<div class="row" onclick="toggleFin('+i+')"><div class="txt"><div class="t1" style="font-size:13.5px">'+esc(FINAL[i])+'</div></div>'+
+      '<div class="chk '+(on?'on':'')+'">✓</div></div>';
+  }
+  html+='</div>';
+
+  /* 备份 */
+  html+='<div class="card w2"><h2>备份 / 迁移</h2>'+
+    '<button class="btn block" onclick="exportData()">导出全部记录</button>'+
+    '<textarea id="io" class="mt8" placeholder="导出的 JSON 出现在这里；换设备时把旧 JSON 粘进来再点导入"></textarea>'+
+    '<div class="btn-row"><button class="btn ghost" onclick="copyIO()">复制</button>'+
+    '<button class="btn blue" onclick="importData()">导入</button></div></div>';
+
+  html+='<div class="card w2"><h2>危险操作</h2>'+
+    '<button class="btn ghost block" onclick="resetAll()">清空本机打卡记录</button>'+
+    '<div class="small mt8">只清本机；已同步到服务端的数据仍在，下次拉取会回来。</div></div>';
+
+  html+='<div class="card w2"><h2>关于</h2><div class="small">'+
+    '数据默认只存在本机；登录同步后存到你自己的服务器（SQLite 文件）。<br>'+
+    '计划来源：《AI-Agent 学习计划 v2（8 个月版）》，共 '+DAYS.length+' 天。<br>版本 2.0</div></div>';
+
+  el('view').innerHTML=html;
+  checkWechat();
+}
+/* ---------- 登录 ---------- */
+var AUTH_MODE='login';
+function showAuth(){
+  var a=el('auth'); if(!a) return;
+  a.className='auth';
+  if(el('asrv')) el('asrv').value = SY.url || defaultServer();
+  if(el('au')) el('au').value = SY.user || '';
+  if(el('ap')) el('ap').value='';
+  if(el('ap2')) el('ap2').value='';
+  authMode('login');
+  setTimeout(function(){ if(el('ap')) el('ap').focus(); },120);
+}
+function hideAuth(){ var a=el('auth'); if(a) a.className='auth hide'; }
+function defaultServer(){
+  if(location.protocol==='http:'||location.protocol==='https:') return location.origin;
+  return 'http://127.0.0.1:8790';
+}
+function authMode(m){
+  AUTH_MODE=m;
+  if(el('tabLogin')) el('tabLogin').className = m==='login'?'on':'';
+  if(el('tabReg')) el('tabReg').className = m==='reg'?'on':'';
+  if(el('ap2')) el('ap2').className = m==='reg'?'':'hide';
+  if(el('authbtn')) el('authbtn').textContent = m==='reg'?'注册并登录':'登录';
+  if(el('autherr')) el('autherr').textContent='';
+}
+function authErr(m){ if(el('autherr')) el('autherr').textContent=m||''; }
+function doAuth(){
+  var u=(el('au').value||'').trim();
+  var p=(el('ap').value||'');
+  var p2=(el('ap2').value||'');
+  var srv=(el('asrv')&&el('asrv').value||'').trim().replace(/\/+$/,'');
+  authErr('');
+  if(!u){ authErr('请输入用户名'); return; }
+  if(!p){ authErr('请输入密码'); return; }
+  if(AUTH_MODE==='reg'){
+    if(p.length<6){ authErr('密码至少 6 位'); return; }
+    if(p!==p2){ authErr('两次输入的密码不一样'); return; }
+  }
+  if(srv) { SY.url=srv; saveSY(); }
+  var btn=el('authbtn'); if(btn){ btn.disabled=true; btn.textContent=AUTH_MODE==='reg'?'注册中…':'登录中…'; }
+  var p1 = AUTH_MODE==='reg' ? authRegister(u,p) : authLogin(u,p);
+  p1.then(function(j){
+    hideAuth();
+    renderAll();
+    toast((AUTH_MODE==='reg'?'注册成功，已登录：':'欢迎回来，')+j.username);
+  }).catch(function(e){
+    authErr(e.message||'连接失败，检查服务是否在跑');
+  }).then(function(){
+    if(btn){ btn.disabled=false; btn.textContent=AUTH_MODE==='reg'?'注册并登录':'登录'; }
+  });
+}
+function offlineMode(){ hideAuth(); renderAll(); toast('离线模式：数据只存在这台电脑'); }
+var logoutArm=false;
+function doLogout(){
+  if(!logoutArm){
+    logoutArm=true;
+    var b=el('logoutbtn'); if(b) b.textContent='再点一次确认退出';
+    setTimeout(function(){ logoutArm=false; var b2=el('logoutbtn'); if(b2) b2.textContent='退出登录'; },5000);
+    return;
+  }
+  logoutArm=false;
+  SY.token=''; SY.user=''; SY.rev=0; saveSY();
+  S={startDate:S.startDate,goal:S.goal,setAt:Date.now(),logs:{},cp:{},fin:{},quiz:{}};
+  saveJSON(KEY,S);
+  renderAll(); showAuth();
+  toast('已退出，本机进度已清空');
+}
+function doSync(){ if(!SY.token){ showAuth(); return; } syncPush().then(function(){ renderMe(); toast('同步完成'); }); }
+function doWechat(){
+  if(!apiBase()){ toast('先填服务地址'); return; }
+  fetch(apiBase()+'/api/wechat/url').then(function(r){ return r.json(); }).then(function(j){
+    if(j.enabled&&j.url){ location.href=j.url; } else { toast('服务端未配置微信登录'); }
+  }).catch(function(){ toast('连不上服务'); });
+}
+function checkWechat(){
+  if(!apiBase()) return;
+  fetch(apiBase()+'/api/ping').then(function(r){ return r.json(); }).then(function(j){
+    var b=el('wxbtn'); if(b&&j.wechat) b.style.display='block';
+  }).catch(function(){});
+}
+function saveStart(){ var v=el('sd').value; if(!v) return; S.startDate=v; S.setAt=Date.now(); save(); schedulePush(); renderAll(); toast('起始日期已保存'); }
+function setReminderNative(){
+  var v=(el('rt')&&el('rt').value)||'08:30';
+  var p=v.split(':'); var h=parseInt(p[0],10); var m=parseInt(p[1],10);
+  if(isNaN(h)) h=8; if(isNaN(m)) m=30;
+  try{ Android.setReminder(h,m); localStorage.setItem('ygbuddy_rt',v); toast('已设置每天 '+v+' 提醒'); }
+  catch(e){ toast('设置失败：'+e.message); }
+}
+function saveGoal(){ S.goal=parseInt(el('gl').value,10)||120; S.setAt=Date.now(); save(); schedulePush(); toast('目标改为 '+S.goal+' 分钟'); }
+function toggleFin(i){ var cur=S.fin[i]&&S.fin[i].v; S.fin[i]={v:cur?0:1,at:Date.now()}; S.setAt=Date.now(); save(); schedulePush(); renderMe(); }
+function exportData(){ el('io').value=JSON.stringify(S); toast('已生成，点复制保存到别处'); }
+function copyIO(){
+  var ta=el('io'); if(!ta.value){ toast('先导出'); return; }
+  ta.select();
+  try{ document.execCommand('copy'); toast('已复制'); }catch(e){ toast('长按文本手动复制'); }
+}
+function importData(){
+  var v=el('io').value; if(!v){ toast('先粘贴 JSON'); return; }
+  try{
+    var o=JSON.parse(v);
+    if(!o||typeof o!=='object') throw new Error('bad');
+    S=o;
+    if(!S.startDate) S.startDate='2026-10-27';
+    if(!S.goal) S.goal=120;
+    if(!S.logs) S.logs={}; if(!S.cp) S.cp={}; if(!S.fin) S.fin={}; if(!S.quiz) S.quiz={};
+    S.setAt=Date.now();
+    save(); schedulePush(); renderAll(); toast('导入成功');
+  }catch(e){ toast('JSON 不合法'); }
+}
+var resetArm=false;
+function resetAll(){
+  if(!resetArm){
+    resetArm=true; toast('再点一次确认清空');
+    setTimeout(function(){ resetArm=false; },5000);
+    return;
+  }
+  resetArm=false;
+  S.logs={}; S.cp={}; S.fin={}; S.quiz={}; S.setAt=Date.now();
+  save(); schedulePush(); renderAll(); toast('已清空');
+}
+
+/* ================= 路由 ================= */
+var TAB='today';
+function go(t){
+  TAB=t;
+  var v=el('view'); if(v) v.className=t;
+  var links=document.querySelectorAll('#tabbar a');
+  for(var i=0;i<links.length;i++){ links[i].className=links[i].getAttribute('data-t')===t?'on':''; }
+  if(t==='today') renderToday();
+  else if(t==='quiz') renderQuiz();
+  else if(t==='prog') renderProg();
+  else if(t==='cp') renderCp();
+  else renderMe();
+  window.scrollTo(0,0);
+}
+function renderAll(){ renderHdr(); go(TAB); }
+
+document.getElementById('tabbar').addEventListener('click',function(e){
+  var a=e.target.closest?e.target.closest('a'):null;
+  if(a){ e.preventDefault(); go(a.getAttribute('data-t')); }
+});
+window.addEventListener('hashchange',function(){
+  var h=location.hash.replace('#','');
+  if(h&&h!==TAB) go(h);
+});
+
+/* 启动 */
+(function(){
+  var h=location.hash.replace('#','');
+  if(h&&['today','quiz','prog','cp','me'].indexOf(h)>=0) TAB=h;
+
+  // 微信回调带回的 token
+  var qs=location.search||'';
+  var mt=qs.match(/token=([^&]+)/), mu=qs.match(/user=([^&]+)/);
+  if(mt){
+    SY.token=decodeURIComponent(mt[1]);
+    if(mu) SY.user=decodeURIComponent(mu[1]);
+    saveSY(); toast('微信登录成功');
+  }
+
+  renderHdr(); go(TAB);
+
+  if(SY.token && SY.url){
+    hideAuth();
+    syncPush();
+  } else if(SY.token && !SY.url){
+    SY.url = defaultServer(); saveSY();
+    hideAuth(); syncPush();
+  } else {
+    showAuth();
+  }
+
+  // 自动同步
+  setInterval(function(){
+    if(SY.token&&SY.auto&&apiBase()){ syncPush(); }
+  },60000);
+
+  // 跨天刷新
+  var dayKey=ymd(todayD());
+  setInterval(function(){
+    if(ymd(todayD())!==dayKey){ dayKey=ymd(todayD()); renderAll(); }
+  },60000);
+})();
+</script>
+</body>
+</html>

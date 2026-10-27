@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: agent-study
+    runtime: python
+    plan: free
+    region: singapore
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server/server.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      # 下面两个在 Render 面板里填，别提交进仓库
+      - key: GIST_ID
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false

@@ -1,0 +1,1952 @@
+[
+    {
+        "id":  "W0-1",
+        "flag":  "`python -V` 显示 3.12.x；`git --version` 显示 2.x；`git log` 有首个 commit 且 `git status` 干净",
+        "dow":  2,
+        "phaseName":  "启动周",
+        "phase":  "W0",
+        "date":  "2026-10-27",
+        "task":  "装环境 + 建仓：\u003cbr\u003e`winget install --id Python.Python.3.12 -e`\u003cbr\u003e`winget install --id Git.Git -e`\u003cbr\u003e`winget install --id Microsoft.VisualStudioCode -e`\u003cbr\u003e装完关掉所有终端和 VS Code 重开；\u003cbr\u003e`git config --global user.name \"你的名字\"`\u003cbr\u003e`git config --global user.email \"你的邮箱\"`\u003cbr\u003e建 `D:\\dev\\agent-lab`、`git init`、写 `.gitignore`",
+        "week":  ""
+    },
+    {
+        "id":  "W0-2",
+        "flag":  "12 段全都能跑；报错能自己改对",
+        "dow":  3,
+        "phaseName":  "启动周",
+        "phase":  "W0",
+        "date":  "2026-10-28",
+        "task":  "12 个语法点，每个写 3 行跑一遍：变量 / f-string / list / dict / if / for / 函数+return / import / try-except / 读文件 / 写文件 / `len()`",
+        "week":  ""
+    },
+    {
+        "id":  "W0-3",
+        "flag":  "`notes/errors.md` 有 5 条；随手挑一条，30 秒内说清原因",
+        "dow":  4,
+        "phaseName":  "启动周",
+        "phase":  "W0",
+        "date":  "2026-10-29",
+        "task":  "故意造 5 个错：`NameError` / `TypeError` / `KeyError` / `IndexError` / `IndentationError`。每个抄下「最后一行 + 报错行号 + 我怎么改的」",
+        "week":  ""
+    },
+    {
+        "id":  "W0-4",
+        "flag":  "找到 bug，并写下「我在第几行加 print 才看出来的」",
+        "dow":  5,
+        "phaseName":  "启动周",
+        "phase":  "W0",
+        "date":  "2026-10-30",
+        "task":  "让 AI 生成一段 30 行有 bug 的代码，只用 print 定位，不许让 AI 说答案",
+        "week":  ""
+    },
+    {
+        "id":  "W0-5",
+        "flag":  "30 分钟内跑通 = 进 M1；\u003cbr\u003e跑不通 = 再练 3 天语法（重做 W0-2/W0-3），不要进 M1",
+        "dow":  6,
+        "phaseName":  "启动周",
+        "phase":  "W0",
+        "date":  "2026-10-31",
+        "task":  "诊断测试（AI 禁言）：不看任何参考，写「读 `data.txt` → 统计行数 → 打印前 3 行」约 15 行",
+        "week":  ""
+    },
+    {
+        "id":  "缓冲日",
+        "dow":  0,
+        "task":  "缓冲日：拿模型 API Key（存环境变量，不写进代码）、跑通第一次纯对话、配 PyPI 镜像、写 W0 复盘三段",
+        "phase":  "W0",
+        "week":  "W0",
+        "flag":  "",
+        "phaseName":  "启动周",
+        "date":  "2026-11-01"
+    },
+    {
+        "id":  "D1",
+        "flag":  "改一个字符串就能改变输出风格",
+        "dow":  1,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-02",
+        "task":  "把 11/01 的脚本改成 `chat(messages)` 函数；加 `system`；调两次，只改 system 让它换语气",
+        "week":  "W1"
+    },
+    {
+        "id":  "D2",
+        "flag":  "屏幕上出现 `tool_calls` 的 JSON",
+        "dow":  2,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-03",
+        "task":  "手敲 `TOOLS` 定义（一个 `get_time`，含 `name / description / parameters`），先不写循环，只打印模型返回的 `tool_calls`",
+        "week":  "W1"
+    },
+    {
+        "id":  "D3",
+        "flag":  "模型自己调 `get_time`，并答出正确时间",
+        "dow":  3,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-04",
+        "task":  "补完循环：模型要工具 → 你执行 → 结果以 `role=tool` 回传 → 再请求 → 直到它给答案",
+        "week":  "W1"
+    },
+    {
+        "id":  "D4",
+        "flag":  "`notes/D4.md` 写下 3 条「现象 → 原因」",
+        "dow":  4,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-05",
+        "task":  "改坏三处：① `range(5)`→`range(1)` ② 删 `tools` 参数 ③ 删 `description`",
+        "week":  "W1"
+    },
+    {
+        "id":  "D5",
+        "flag":  "模型改调新工具了（没调 = description 写得不清楚，这就是工具设计第一课）",
+        "dow":  5,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-06",
+        "task":  "把 `get_time` 改名成 `get_weather`、返回假数据，同步改 `name` 和 `description`",
+        "week":  "W1"
+    },
+    {
+        "id":  "D6",
+        "flag":  "跑一次能看到完整调用链",
+        "dow":  6,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-07",
+        "task":  "AI 禁言日：给这段 loop 加 3 行日志 `[step n] tool=xxx 耗时=xxms`，全程只查报错",
+        "week":  "W1"
+    },
+    {
+        "id":  "D7",
+        "flag":  "不看也能写出 80%，且能跑通",
+        "dow":  0,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-08",
+        "task":  "重写日：关掉所有参考，凭记忆重写整个脚本（允许回看 3 次）",
+        "week":  "W1"
+    },
+    {
+        "id":  "D8",
+        "flag":  "模型能主动读文件并引用内容",
+        "dow":  1,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-09",
+        "task":  "加第二个工具 `read_file(path)`：读本地 txt，限制 2000 字",
+        "week":  "W2"
+    },
+    {
+        "id":  "D9",
+        "flag":  "传个假路径，模型会说「文件不存在」",
+        "dow":  2,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-10",
+        "task":  "工具执行异常不崩溃：文件不存在时，把错误字符串回传给模型而不是抛异常",
+        "week":  "W2"
+    },
+    {
+        "id":  "D10",
+        "flag":  "故意让它死循环，5 步后自动停",
+        "dow":  3,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-11",
+        "task":  "加 `max_steps=5`；超限就停并说明原因；加「没有 tool_calls 就结束」",
+        "week":  "W2"
+    },
+    {
+        "id":  "D11",
+        "flag":  "每次运行末尾打印「本次花费 ¥0.00x」",
+        "dow":  4,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-12",
+        "task":  "加 token 统计与成本估算（输入/输出分开算，按你的模型单价）",
+        "week":  "W2"
+    },
+    {
+        "id":  "D12",
+        "flag":  "写下一句「描述怎么改，模型就怎么选」",
+        "dow":  5,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-13",
+        "task":  "把 3 个工具描述各补一句「什么时候该用 / 什么时候不该用」",
+        "week":  "W2"
+    },
+    {
+        "id":  "D13",
+        "flag":  "5 个改动都能独立复现",
+        "dow":  6,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-14",
+        "task":  "AI 禁言日：把 D8–D12 五次改动逐个复现一遍，全程只靠自己的笔记",
+        "week":  "W2"
+    },
+    {
+        "id":  "D14",
+        "flag":  "一次写对，最多回看 1 次",
+        "dow":  0,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-15",
+        "task":  "重写日：关文件重写整个 loop（2 工具 + 异常 + 上限 + 日志 + 成本）",
+        "week":  "W2"
+    },
+    {
+        "id":  "D15",
+        "flag":  "屏幕上看到真实内容，不是假数据",
+        "dow":  1,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-16",
+        "task":  "接一个 RSS 源（免 key，最稳：36kr / 少数派 / GitHub Trending 的 `.atom`），先用 `urllib` 拉下来、只打印前 500 字",
+        "week":  "W3"
+    },
+    {
+        "id":  "D16",
+        "flag":  "打印出 10 条结构化数据",
+        "dow":  2,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-17",
+        "task":  "用 `xml.etree` 解析出「标题 + 链接 + 时间」三项，存成 list",
+        "week":  "W3"
+    },
+    {
+        "id":  "D17",
+        "flag":  "断网跑一次，模型说「取数失败」而不是崩",
+        "dow":  3,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-18",
+        "task":  "处理三种失败：超时、非 200 状态码、字段缺失；每种都返回一句人话给模型",
+        "week":  "W3"
+    },
+    {
+        "id":  "D18",
+        "flag":  "能说清「为什么第 3 问的历史里带着第 1 问」",
+        "dow":  4,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-19",
+        "task":  "多轮：同一会话连问 3 个彼此相关的问题，观察 `messages` 数组怎么长",
+        "week":  "W3"
+    },
+    {
+        "id":  "D19",
+        "flag":  "记录一组「裁剪前 / 后」的数字",
+        "dow":  5,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-20",
+        "task":  "上下文裁剪：只保留 system + 最近 6 条；对比裁剪前后的回答质量与花费",
+        "week":  "W3"
+    },
+    {
+        "id":  "D20",
+        "flag":  "README 有「已知限制」，≥5 条",
+        "dow":  6,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-21",
+        "task":  "AI 禁言日：`git log` 从头看一遍自己的 20 次提交，把踩过的坑整理进 `README.md` 的「已知限制」章节",
+        "week":  "W3"
+    },
+    {
+        "id":  "D21",
+        "flag":  "不看也能跑通",
+        "dow":  0,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-22",
+        "task":  "重写日：3 工具 + 多轮 + 裁剪 + 错误处理，一次写完",
+        "week":  "W3"
+    },
+    {
+        "id":  "D22",
+        "flag":  "60 分钟内跑通",
+        "dow":  1,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-23",
+        "task":  "不看任何参考，从空文件重写一版（第 3 次重写）",
+        "week":  "W4"
+    },
+    {
+        "id":  "D23",
+        "flag":  "同一个脚本换 3 个模型都跑通",
+        "dow":  2,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-24",
+        "task":  "把 `chat()` 里的 `BASE_URL` 换成第二家平台（DeepSeek 或通义），只改环境变量",
+        "week":  "W4"
+    },
+    {
+        "id":  "D24",
+        "flag":  "模型能先搜再读",
+        "dow":  3,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-25",
+        "task":  "加第 4 个工具 `search_notes(keyword)`：在本地一个文件夹里按关键词找文件名",
+        "week":  "W4"
+    },
+    {
+        "id":  "D25",
+        "flag":  "故意传错参数，模型能自己改对",
+        "dow":  4,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-26",
+        "task":  "让工具「自愈」：报错里带可执行提示（如「合法值只有 a/b/c」）",
+        "week":  "W4"
+    },
+    {
+        "id":  "D26",
+        "flag":  "改配置不改代码",
+        "dow":  5,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-27",
+        "task":  "加 `config.json`：把模型名、阈值、步数上限、源地址全挪出去",
+        "week":  "W4"
+    },
+    {
+        "id":  "D27",
+        "flag":  "有一张「5 次运行」的表",
+        "dow":  6,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-28",
+        "task":  "AI 禁言日：一次连续跑 5 个不同问题，记录每次的耗时和花费",
+        "week":  "W4"
+    },
+    {
+        "id":  "D28",
+        "flag":  "40 分钟内写完并跑通 = 提前达标；\u003cbr\u003e60 分钟写不完 = 正常，继续 W5；\u003cbr\u003e完全写不出 = 回到 W4-1 再来一周，不进 W5",
+        "dow":  0,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-29",
+        "task":  "重写日 + 检查点 1：关文件写出「2 工具 + 上限 + 错误回传」，计时",
+        "week":  "W4"
+    },
+    {
+        "id":  "D29",
+        "flag":  "一页 `design.md`，能说清输入输出",
+        "dow":  1,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-11-30",
+        "task":  "只写文档不写代码：定题「每日简报 Agent」。写清 3 个源、输出格式、失败怎么办",
+        "week":  "W5"
+    },
+    {
+        "id":  "D30",
+        "flag":  "`raw.json` 里有真实内容",
+        "dow":  2,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-01",
+        "task":  "只写抓取模块，完全不接模型，结果存 `data/raw.json`",
+        "week":  "W5"
+    },
+    {
+        "id":  "D31",
+        "flag":  "一条 list 里有 3 个源的数据",
+        "dow":  3,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-02",
+        "task":  "3 个源逐个跑通，统一成 `{source, title, url, time}` 结构",
+        "week":  "W5"
+    },
+    {
+        "id":  "D32",
+        "flag":  "拔网线跑一次，10 秒后放弃并报错",
+        "dow":  4,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-03",
+        "task":  "加超时（每源 10s）+ 重试（最多 2 次，间隔递增）",
+        "week":  "W5"
+    },
+    {
+        "id":  "D33",
+        "flag":  "故意写错一个源地址，其余照常出结果",
+        "dow":  5,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-04",
+        "task":  "单源失败降级：跳过并记录，不影响整体",
+        "week":  "W5"
+    },
+    {
+        "id":  "D34",
+        "flag":  "中文标题不乱码",
+        "dow":  6,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-05",
+        "task":  "AI 禁言日：加 User-Agent 与编码处理（`resp.read().decode(\"utf-8\", \"ignore\")`），解决中文乱码",
+        "week":  "W5"
+    },
+    {
+        "id":  "D35",
+        "flag":  "不看参考，30 分钟内跑通",
+        "dow":  0,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-06",
+        "task":  "重写日：重写整个抓取模块",
+        "week":  "W5"
+    },
+    {
+        "id":  "D36",
+        "flag":  "生成一份人能读完的摘要",
+        "dow":  1,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-07",
+        "task":  "接模型做摘要，每条 ≤60 字，控制总长度",
+        "week":  "W6"
+    },
+    {
+        "id":  "D37",
+        "flag":  "重复条目被合并",
+        "dow":  2,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-08",
+        "task":  "加去重（标题归一化 + 简易 Jaccard，不要上向量库）",
+        "week":  "W6"
+    },
+    {
+        "id":  "D38",
+        "flag":  "一条命令出报告",
+        "dow":  3,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-09",
+        "task":  "做成一键运行：`python run.py` 走完全流程，输出 `report.md`",
+        "week":  "W6"
+    },
+    {
+        "id":  "D39",
+        "flag":  "有一张「本次运行」的记录",
+        "dow":  4,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-10",
+        "task":  "端到端真实跑一次，记录耗时、成本、失败源",
+        "week":  "W6"
+    },
+    {
+        "id":  "D40",
+        "flag":  "30 秒内从日志看出这次为什么失败",
+        "dow":  5,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-11",
+        "task":  "加 `logs/{date}.log`：开始/结束/耗时/成功源数/花费",
+        "week":  "W6"
+    },
+    {
+        "id":  "D41",
+        "flag":  "陌生人照 README 能跑起来",
+        "dow":  6,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-12",
+        "task":  "AI 禁言日：写 README（怎么装 / 怎么跑 / 做了什么取舍）",
+        "week":  "W6"
+    },
+    {
+        "id":  "D42",
+        "flag":  "写得出 → 进 M2；\u003cbr\u003e写不出 → 守住 M1 再练一周，不要进 M2（地基没浇完就上楼，后面全塌）",
+        "dow":  0,
+        "phaseName":  "生成能力",
+        "phase":  "M1",
+        "date":  "2026-12-13",
+        "task":  "检查点 2 + M1 复盘：关文件写 loop，40 分钟计时",
+        "week":  "W6"
+    },
+    {
+        "id":  "D43",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-14",
+        "task":  "把现有 3 个工具重审：一个工具只做一件事，能拆就拆",
+        "week":  "W7"
+    },
+    {
+        "id":  "D44",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-15",
+        "task":  "参数加约束：`enum`（固定选项）、`required`（必填）、类型写死",
+        "week":  "W7"
+    },
+    {
+        "id":  "D45",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-16",
+        "task":  "每个 description 补两句：什么时候该用 / 什么时候不该用",
+        "week":  "W7"
+    },
+    {
+        "id":  "D46",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-17",
+        "task":  "精简返回值：只回模型真正要的字段，长文本截断并注明「已截断」",
+        "week":  "W7"
+    },
+    {
+        "id":  "D47",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-18",
+        "task":  "工具失败要「自愈」：报错里带可执行提示",
+        "week":  "W7"
+    },
+    {
+        "id":  "D48",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-19",
+        "task":  "重写 `tools.py`（不看参考，允许回看 1 次）",
+        "week":  "W7"
+    },
+    {
+        "id":  "D49",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-20",
+        "task":  "复盘：写《工具设计的 5 条规则》，每条配一个你踩过的例子",
+        "week":  "W7"
+    },
+    {
+        "id":  "D50",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-21",
+        "task":  "会话持久化：`messages` 存成 `sessions/xxx.json`，能重开继续聊",
+        "week":  "W8"
+    },
+    {
+        "id":  "D51",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-22",
+        "task":  "加载历史：启动时读回 session，验证第 5 轮还记得第 1 轮",
+        "week":  "W8"
+    },
+    {
+        "id":  "D52",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-23",
+        "task":  "摘要式记忆：10 轮以前的内容压成一段摘要塞回 system",
+        "week":  "W8"
+    },
+    {
+        "id":  "D53",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-24",
+        "task":  "上下文预算：估算 token，超阈值先丢最旧的，保留 system + 最近 6 条",
+        "week":  "W8"
+    },
+    {
+        "id":  "D54",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-25",
+        "task":  "长会话压测：连问 20 轮，看第几轮开始「忘事」，记下这个数字",
+        "week":  "W8"
+    },
+    {
+        "id":  "D55",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-26",
+        "task":  "重写整个会话层",
+        "week":  "W8"
+    },
+    {
+        "id":  "D56",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-27",
+        "task":  "复盘：写清「记忆的三种做法各适合什么场景」",
+        "week":  "W8"
+    },
+    {
+        "id":  "D57",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-28",
+        "task":  "要求模型只输出 JSON（`{\"title\":..,\"tags\":[..],\"score\":0-100}`）",
+        "week":  "W9"
+    },
+    {
+        "id":  "D58",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-29",
+        "task":  "解析容错：`json.loads` 失败就把错误回传让它自己修，最多重试 2 次",
+        "week":  "W9"
+    },
+    {
+        "id":  "D59",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-30",
+        "task":  "字段校验：缺字段 / 类型错就打回重写，不让脏数据往下流",
+        "week":  "W9"
+    },
+    {
+        "id":  "D60",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2026-12-31",
+        "task":  "把这份 JSON 接到下一步代码（排序、过滤、存文件）",
+        "week":  "W9"
+    },
+    {
+        "id":  "D61",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-01",
+        "task":  "批量跑 10 条输入，统计「一次就合法」的比例（这就是你的第一个指标）",
+        "week":  "W9"
+    },
+    {
+        "id":  "D62",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-02",
+        "task":  "重写：结构化输出 + 校验 + 重试",
+        "week":  "W9"
+    },
+    {
+        "id":  "D63",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-03",
+        "task":  "复盘：记下「一次合格率」，M5 会拿它做对比基线",
+        "week":  "W9"
+    },
+    {
+        "id":  "D64",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-04",
+        "task":  "加简单路由：按关键词决定走哪条工具链（先写死规则，不用模型）",
+        "week":  "W10"
+    },
+    {
+        "id":  "D65",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-05",
+        "task":  "配置外置：源地址、模型名、阈值、步数上限全挪进 `config.json`",
+        "week":  "W10"
+    },
+    {
+        "id":  "D66",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-06",
+        "task":  "整合：3 工具 + 多轮记忆 + 结构化输出 + 配置，跑通一个完整场景",
+        "week":  "W10"
+    },
+    {
+        "id":  "D67",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-07",
+        "task":  "端到端：用它真实解决你自己的一件小事（查资料 / 整理文件 / 汇总信息）",
+        "week":  "W10"
+    },
+    {
+        "id":  "D68",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-08",
+        "task":  "异常注入：断网、错参数、超长输入、空输入，四种各跑一次",
+        "week":  "W10"
+    },
+    {
+        "id":  "D69",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-09",
+        "task":  "重写入口 `main.py`",
+        "week":  "W10"
+    },
+    {
+        "id":  "D70",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "骨架",
+        "phase":  "M2",
+        "date":  "2027-01-10",
+        "task":  "月复盘（四段式）+ `git tag m2-done`",
+        "week":  "W10"
+    },
+    {
+        "id":  "D71",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-11",
+        "task":  "3 个源统一结构 + 落盘 `data/2027-01-17.json`，按日期归档",
+        "week":  "W10"
+    },
+    {
+        "id":  "D72",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-12",
+        "task":  "并发抓取（`concurrent.futures`），把总耗时从 30s 压到 10s 内",
+        "week":  "W10"
+    },
+    {
+        "id":  "D73",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-13",
+        "task":  "源站改版演习：手动改一个源的 CSS/XML 路径，看你的代码怎么报错、怎么降级",
+        "week":  "W10"
+    },
+    {
+        "id":  "D74",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-14",
+        "task":  "把「失败源清单」写进 `report.md` 末尾（让读者知道缺了什么）",
+        "week":  "W10"
+    },
+    {
+        "id":  "D75",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-15",
+        "task":  "加「抓取成功率」统计，写入日志",
+        "week":  "W10"
+    },
+    {
+        "id":  "D76",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-16",
+        "task":  "重写 `fetch.py`",
+        "week":  "W10"
+    },
+    {
+        "id":  "D77",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-17",
+        "task":  "复盘：写《抓取层的 6 个必做检查》",
+        "week":  "W10"
+    },
+    {
+        "id":  "D78",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-18",
+        "task":  "摘要提示词迭代 3 版：v1 直译 → v2 加「说人话」约束 → v3 加「保留数字」约束",
+        "week":  "W10"
+    },
+    {
+        "id":  "D79",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-19",
+        "task":  "对比 3 版输出，选最好的一版并记录理由（这就是 prompt 工程的全部真相）",
+        "week":  "W10"
+    },
+    {
+        "id":  "D80",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-20",
+        "task":  "去重升级：标题归一化 + 内容相似度，误杀要能看出来",
+        "week":  "W10"
+    },
+    {
+        "id":  "D81",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-21",
+        "task":  "控制单次成本：批处理多条、限制输出长度，把每条压到 1 分钱内",
+        "week":  "W10"
+    },
+    {
+        "id":  "D82",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-22",
+        "task":  "生成最终 `report.md`：分组、排序、带来源链接",
+        "week":  "W10"
+    },
+    {
+        "id":  "D83",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-23",
+        "task":  "重写主流程",
+        "week":  "W10"
+    },
+    {
+        "id":  "D84",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-24",
+        "task":  "复盘 + 更新 README 的「成本」章节",
+        "week":  "W10"
+    },
+    {
+        "id":  "D85",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-25",
+        "task":  "注册 PushPlus 拿 token（或配 QQ 邮箱 SMTP 授权码），先单独测通「发一条消息」",
+        "week":  "W10"
+    },
+    {
+        "id":  "D86",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-26",
+        "task":  "把推送封装成 `push(text)`，失败重试 2 次",
+        "week":  "W10"
+    },
+    {
+        "id":  "D87",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-27",
+        "task":  "手动跑通全流程 + 推送成功",
+        "week":  "W10"
+    },
+    {
+        "id":  "D88",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-28",
+        "task":  "设定时任务（命令行，不用界面）：\u003cbr\u003e`schtasks /Create /TN \"daily-brief\" /TR \"C:\\Python312\\python.exe D:\\dev\\agent-lab\\run.py\" /SC DAILY /ST 08:30 /F`\u003cbr\u003e先 `schtasks /Run /TN \"daily-brief\"` 手动触发一次验证",
+        "week":  "W10"
+    },
+    {
+        "id":  "D89",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-29",
+        "task":  "断网、Key 失效、源改版，三种故障各演练一次，确认都能给你发「我挂了」的通知",
+        "week":  "W10"
+    },
+    {
+        "id":  "D90",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-30",
+        "task":  "重写 `run.py`，把流程拆成 `fetch → dedupe → summarize → render → push`",
+        "week":  "W10"
+    },
+    {
+        "id":  "D91",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-01-31",
+        "task":  "复盘 + 手画一张架构图拍照存档",
+        "week":  "W10"
+    },
+    {
+        "id":  "D92",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-01",
+        "task":  "不写新功能。每天 10 分钟看日志（固定动作，不占主段），异常记进 `blocked.md`",
+        "week":  "W10"
+    },
+    {
+        "id":  "D93",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-02",
+        "task":  "同上 + 修 1 个日志里发现的 bug",
+        "week":  "W10"
+    },
+    {
+        "id":  "D94",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-03",
+        "task":  "同上 + 补 README 的「已知限制」",
+        "week":  "W10"
+    },
+    {
+        "id":  "D95",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-04",
+        "task":  "同上 + 把 7 天的运行数据做成一张表（天数/成功/失败原因/花费）",
+        "week":  "W10"
+    },
+    {
+        "id":  "D96",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-05",
+        "task":  "同上 + 上线前清理：`git log -p | findstr /i \"key\"` 确认仓库里没 key",
+        "week":  "W10"
+    },
+    {
+        "id":  "D97",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-06",
+        "task":  "同上 + 写《连续运行的 3 个隐性成本》（不是为了交作业，为了 M6 面试）",
+        "week":  "W10"
+    },
+    {
+        "id":  "D98",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-07",
+        "task":  "重写日 + 周复盘",
+        "week":  "W10"
+    },
+    {
+        "id":  "D99",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-08",
+        "task":  "只做三件事，允许减半：\u003cbr\u003e① 每天 10 分钟看线上日志有没有异常\u003cbr\u003e② 把 M1 的 loop 再凭记忆重写一次（这周就做这一件重活）\u003cbr\u003e③ 补齐前面欠的笔记\u003cbr\u003e不要开新内容",
+        "week":  "W10"
+    },
+    {
+        "id":  "D100",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-09",
+        "task":  "只做三件事，允许减半：\u003cbr\u003e① 每天 10 分钟看线上日志有没有异常\u003cbr\u003e② 把 M1 的 loop 再凭记忆重写一次（这周就做这一件重活）\u003cbr\u003e③ 补齐前面欠的笔记\u003cbr\u003e不要开新内容",
+        "week":  "W10"
+    },
+    {
+        "id":  "D101",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-10",
+        "task":  "只做三件事，允许减半：\u003cbr\u003e① 每天 10 分钟看线上日志有没有异常\u003cbr\u003e② 把 M1 的 loop 再凭记忆重写一次（这周就做这一件重活）\u003cbr\u003e③ 补齐前面欠的笔记\u003cbr\u003e不要开新内容",
+        "week":  "W10"
+    },
+    {
+        "id":  "D102",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-11",
+        "task":  "只做三件事，允许减半：\u003cbr\u003e① 每天 10 分钟看线上日志有没有异常\u003cbr\u003e② 把 M1 的 loop 再凭记忆重写一次（这周就做这一件重活）\u003cbr\u003e③ 补齐前面欠的笔记\u003cbr\u003e不要开新内容",
+        "week":  "W10"
+    },
+    {
+        "id":  "D103",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-12",
+        "task":  "只做三件事，允许减半：\u003cbr\u003e① 每天 10 分钟看线上日志有没有异常\u003cbr\u003e② 把 M1 的 loop 再凭记忆重写一次（这周就做这一件重活）\u003cbr\u003e③ 补齐前面欠的笔记\u003cbr\u003e不要开新内容",
+        "week":  "W10"
+    },
+    {
+        "id":  "D104",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-13",
+        "task":  "只做三件事，允许减半：\u003cbr\u003e① 每天 10 分钟看线上日志有没有异常\u003cbr\u003e② 把 M1 的 loop 再凭记忆重写一次（这周就做这一件重活）\u003cbr\u003e③ 补齐前面欠的笔记\u003cbr\u003e不要开新内容",
+        "week":  "W10"
+    },
+    {
+        "id":  "D105",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "项目①连续运行",
+        "phase":  "M3",
+        "date":  "2027-02-14",
+        "task":  "只做三件事，允许减半：\u003cbr\u003e① 每天 10 分钟看线上日志有没有异常\u003cbr\u003e② 把 M1 的 loop 再凭记忆重写一次（这周就做这一件重活）\u003cbr\u003e③ 补齐前面欠的笔记\u003cbr\u003e不要开新内容",
+        "week":  "W10"
+    },
+    {
+        "id":  "D106",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-15",
+        "task":  "选部署方式，三选一：① 免费容器（Render / Fly.io，首选）② 轻量云服务器（60–100 元/月）③ 本机常驻 + 内网穿透（cpolar / ngrok，最快但电脑必须开着）。选最省事的，先上线再优化",
+        "week":  "W16"
+    },
+    {
+        "id":  "D107",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-16",
+        "task":  "`pip install flask`（这一个月允许用这一个依赖，因为写 Web 样板不值得手敲）",
+        "week":  "W16"
+    },
+    {
+        "id":  "D108",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-17",
+        "task":  "写 `/chat` 接口（收问题 → 调你的循环 → 返回 JSON）+ 一个极简 HTML 页面",
+        "week":  "W16"
+    },
+    {
+        "id":  "D109",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-18",
+        "task":  "部署到线上，跑通「打开网页 → 提问 → 有回答」",
+        "week":  "W16"
+    },
+    {
+        "id":  "D110",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-19",
+        "task":  "发给 1–2 个朋友用，把他们的原话记下来（包括「这有什么用」）",
+        "week":  "W16"
+    },
+    {
+        "id":  "D111",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-20",
+        "task":  "看第一天日志：报错、慢请求、花费",
+        "week":  "W16"
+    },
+    {
+        "id":  "D112",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-21",
+        "task":  "复盘：写《上线第一天踩的坑》+ 重写 `app.py`",
+        "week":  "W16"
+    },
+    {
+        "id":  "D113",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-22",
+        "task":  "密钥管理：全走环境变量，仓库里搜一遍确认没有任何 key",
+        "week":  "W17"
+    },
+    {
+        "id":  "D114",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-23",
+        "task":  "成本上限：设每日预算，超了直接拒绝并返回人话（这条比限流重要）",
+        "week":  "W17"
+    },
+    {
+        "id":  "D115",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-24",
+        "task":  "访问控制：简单 token 或密码，防止被扫到后白嫖",
+        "week":  "W17"
+    },
+    {
+        "id":  "D116",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-25",
+        "task":  "限流：每 IP 每分钟 N 次，超出返回 429",
+        "week":  "W17"
+    },
+    {
+        "id":  "D117",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-26",
+        "task":  "错误处理：模型超时 / 额度用尽 / 输入过长，各自给一句人话",
+        "week":  "W17"
+    },
+    {
+        "id":  "D118",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-27",
+        "task":  "存活监控：每天固定时间探活一次，挂了给你发通知",
+        "week":  "W17"
+    },
+    {
+        "id":  "D119",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-02-28",
+        "task":  "复盘：更新 README「部署」章节，写清重启命令",
+        "week":  "W17"
+    },
+    {
+        "id":  "D120",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-01",
+        "task":  "列 15 个目标岗位（AI 交付实施 / 中小公司 AI 应用 / 传统行业数字化），抄下每条的 JD 关键词",
+        "week":  "W18"
+    },
+    {
+        "id":  "D121",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-02",
+        "task":  "用 §附录E 四段式把项目①写成一页（没有数字就先写「连续 14 天」，数字后面补）",
+        "week":  "W18"
+    },
+    {
+        "id":  "D122",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-03",
+        "task":  "简历一页初稿（只投 5 家，不追求完美）",
+        "week":  "W18"
+    },
+    {
+        "id":  "D123",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-04",
+        "task":  "投 3 家",
+        "week":  "W18"
+    },
+    {
+        "id":  "D124",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-05",
+        "task":  "投 2 家 + 开始记 `tracking.md`（公司 / 岗位 / JD 关键词 / 投递日 / 状态）",
+        "week":  "W18"
+    },
+    {
+        "id":  "D125",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-06",
+        "task":  "重写日：把 M1 的 loop 再写一遍（第 5 次），计时",
+        "week":  "W18"
+    },
+    {
+        "id":  "D126",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-07",
+        "task":  "复盘：5 家 JD 里出现了哪些你完全没听过的词？记进 `later.md`，现在不要学",
+        "week":  "W18"
+    },
+    {
+        "id":  "D127",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-08",
+        "task":  "选场景：「读我自己的资料回答问题」（资料 = 你的笔记 / 行业文档 / 论文，20–50 篇）",
+        "week":  "W19"
+    },
+    {
+        "id":  "D128",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-09",
+        "task":  "收集资料，清洗成纯文本，按篇存好",
+        "week":  "W19"
+    },
+    {
+        "id":  "D129",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-10",
+        "task":  "写 `design.md`：用户会问什么、答不出时怎么办、怎么算答对",
+        "week":  "W19"
+    },
+    {
+        "id":  "D130",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-11",
+        "task":  "搭最小可跑版本：不接向量库，先「关键词检索 top3 篇 → 全文塞给模型」（很土，但能先看到效果）",
+        "week":  "W19"
+    },
+    {
+        "id":  "D131",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-12",
+        "task":  "搭最小可跑版本：不接向量库，先「关键词检索 top3 篇 → 全文塞给模型」（很土，但能先看到效果）",
+        "week":  "W19"
+    },
+    {
+        "id":  "D132",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-13",
+        "task":  "搭最小可跑版本：不接向量库，先「关键词检索 top3 篇 → 全文塞给模型」（很土，但能先看到效果）",
+        "week":  "W19"
+    },
+    {
+        "id":  "D133",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "上线+试投",
+        "phase":  "M4",
+        "date":  "2027-03-14",
+        "task":  "月复盘 + `git tag m4-done`",
+        "week":  "W19"
+    },
+    {
+        "id":  "D134",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-15",
+        "task":  "定题：「每天从 X 个源里找出跟我关心主题相关的 5 条」",
+        "week":  "W20"
+    },
+    {
+        "id":  "D135",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-16",
+        "task":  "版本 A｜固定流程：写死 `抓 5 个源 → 去重 → 摘要 → 排前 5`，不让模型做任何决策",
+        "week":  "W20"
+    },
+    {
+        "id":  "D136",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-17",
+        "task":  "版本 B｜自主 Agent：给 3 个工具（`fetch_feed` / `read_file` / `search`），让模型自己决定抓哪几个、抓几次、要不要深读",
+        "week":  "W20"
+    },
+    {
+        "id":  "D137",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-18",
+        "task":  "各跑 20 条问题，逐条记录：答对没 / 花多少 / 用几秒 / 调了几次工具",
+        "week":  "W20"
+    },
+    {
+        "id":  "D138",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-19",
+        "task":  "各跑 20 条问题，逐条记录：答对没 / 花多少 / 用几秒 / 调了几次工具",
+        "week":  "W20"
+    },
+    {
+        "id":  "D139",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-20",
+        "task":  "各跑 20 条问题，逐条记录：答对没 / 花多少 / 用几秒 / 调了几次工具",
+        "week":  "W20"
+    },
+    {
+        "id":  "D140",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-21",
+        "task":  "复盘：先别下结论，把原始数据摆出来",
+        "week":  "W20"
+    },
+    {
+        "id":  "D141",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-22",
+        "task":  "从真实需求造 30 条问题，其中 8–10 条故意是「资料里没有答案」的（考它会不会编）",
+        "week":  "W21"
+    },
+    {
+        "id":  "D142",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-23",
+        "task":  "定义「答对」：可判定的标准（必须含某个事实 / 必须说「资料里没有」）",
+        "week":  "W21"
+    },
+    {
+        "id":  "D143",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-24",
+        "task":  "人工标注期望答案，存成 `eval/cases.json`",
+        "week":  "W21"
+    },
+    {
+        "id":  "D144",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-25",
+        "task":  "写评测脚本：跑完自动出「通过率」（关键词命中 + 是否编造就够，不要上 LLM 打分器）",
+        "week":  "W21"
+    },
+    {
+        "id":  "D145",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-26",
+        "task":  "两版各跑一遍，出第一组数字",
+        "week":  "W21"
+    },
+    {
+        "id":  "D146",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-27",
+        "task":  "把错例按类型归类（检索没找到 / 找到但没用 / 编了 / 答偏了）",
+        "week":  "W21"
+    },
+    {
+        "id":  "D147",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-28",
+        "task":  "复盘：哪一类错误最多，决定你下一步改哪里",
+        "week":  "W21"
+    },
+    {
+        "id":  "D148",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-29",
+        "task":  "汇总三维指标：通过率、单次成本、P95 延迟，做成一张表",
+        "week":  "W22"
+    },
+    {
+        "id":  "D149",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-30",
+        "task":  "针对最大一类错例，各优化一版（A 改检索策略，B 改工具描述）",
+        "week":  "W22"
+    },
+    {
+        "id":  "D150",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-03-31",
+        "task":  "重跑测试集，记录提升幅度（只改一处，观察单独影响——这是「能归因」的能力）",
+        "week":  "W22"
+    },
+    {
+        "id":  "D151",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-04-01",
+        "task":  "写《这个场景我选哪个方案，为什么》，用数字支撑，不用形容词；把结论 + 对比表写进 README",
+        "week":  "W22"
+    },
+    {
+        "id":  "D152",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-04-02",
+        "task":  "读《深入理解 AI Agent》第 1 章（循环与上下文管理）+ 上下文工程章节；对照你 M1 手写的 loop，看它在讲你已经做过的哪一步",
+        "week":  "W22"
+    },
+    {
+        "id":  "D153",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-04-03",
+        "task":  "用「原理语言」把 3 个项目各重述一遍（300 字/个，面试可直接用）",
+        "week":  "W22"
+    },
+    {
+        "id":  "D154",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "判断力",
+        "phase":  "M5",
+        "date":  "2027-04-04",
+        "task":  "月复盘 + `git tag m5-done`：什么情况下 B（自主 Agent）反而更差？举出你自己的例子",
+        "week":  "W22"
+    },
+    {
+        "id":  "D155",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-05",
+        "task":  "3 个项目各写四段：问题 / 方案 / 取舍 / 数字（模板见附录E）",
+        "week":  "W23"
+    },
+    {
+        "id":  "D156",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-06",
+        "task":  "补硬数字：从日志里捞「连续运行天数、失败次数、平均耗时、总花费、通过率」",
+        "week":  "W23"
+    },
+    {
+        "id":  "D157",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-07",
+        "task":  "GitHub 整理：每个仓库 README 顶部加「一句话 + 截图 + 三条命令跑起来」",
+        "week":  "W23"
+    },
+    {
+        "id":  "D158",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-08",
+        "task":  "每个仓库加「已知限制」章节（写得出限制 = 真做过）",
+        "week":  "W23"
+    },
+    {
+        "id":  "D159",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-09",
+        "task":  "写 3 分钟口述版自我介绍（念出来，录音回放，删掉所有形容词）",
+        "week":  "W23"
+    },
+    {
+        "id":  "D160",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-10",
+        "task":  "简历终稿（一页），对照 W18 那 5 家的 JD 关键词改措辞",
+        "week":  "W23"
+    },
+    {
+        "id":  "D161",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-11",
+        "task":  "让 AI 扮面试官，只问项目细节，问 20 个问题，记录答不出的",
+        "week":  "W23"
+    },
+    {
+        "id":  "D162",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-12",
+        "task":  "做两版定向简历：① AI 应用开发 ② AI 交付/实施（同一批项目，换措辞与排序）",
+        "week":  "W24"
+    },
+    {
+        "id":  "D163",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-13",
+        "task":  "一页作品集（GitHub Pages 静态页即可）：3 个项目 + 对比表 + 联系方式",
+        "week":  "W24"
+    },
+    {
+        "id":  "D164",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-14",
+        "task":  "准备 20 个「项目会被追问」的问题，逐个写答案（为什么这么设计 / 为什么不用 X / 出过什么事故）",
+        "week":  "W24"
+    },
+    {
+        "id":  "D165",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-15",
+        "task":  "演练 1 分钟版 + 3 分钟版，各讲 5 遍",
+        "week":  "W24"
+    },
+    {
+        "id":  "D166",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-16",
+        "task":  "写一篇 1500 字技术笔记（选题：为什么我先手写 200 行原生 loop 才去看框架），发到掘金/知乎/CSDN 拿外链",
+        "week":  "W24"
+    },
+    {
+        "id":  "D167",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-17",
+        "task":  "全面自检：链接能打开、仓库能 clone、demo 能跑、README 无错字",
+        "week":  "W24"
+    },
+    {
+        "id":  "D168",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-18",
+        "task":  "复盘：简历里还有哪些句子是「形容词」而不是「事实」",
+        "week":  "W24"
+    },
+    {
+        "id":  "D169",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-19",
+        "task":  "列 40 个目标：中小公司 AI 应用 / 传统行业数字化 / AI 交付实施 / 外包岗；按回应概率排序",
+        "week":  "W25"
+    },
+    {
+        "id":  "D170",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-20",
+        "task":  "每天投 5 家，记录：公司 / 岗位 / JD 关键词 / 投递日 / 状态 / 是否内推",
+        "week":  "W25"
+    },
+    {
+        "id":  "D171",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-21",
+        "task":  "每天投 5 家，记录：公司 / 岗位 / JD 关键词 / 投递日 / 状态 / 是否内推",
+        "week":  "W25"
+    },
+    {
+        "id":  "D172",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-22",
+        "task":  "每天投 5 家，记录：公司 / 岗位 / JD 关键词 / 投递日 / 状态 / 是否内推",
+        "week":  "W25"
+    },
+    {
+        "id":  "D173",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-23",
+        "task":  "每天投 5 家，记录：公司 / 岗位 / JD 关键词 / 投递日 / 状态 / 是否内推",
+        "week":  "W25"
+    },
+    {
+        "id":  "D174",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-24",
+        "task":  "复盘：哪类 JD 回应率高？把简历措辞往那类 JD 的用词上靠",
+        "week":  "W25"
+    },
+    {
+        "id":  "D175",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-25",
+        "task":  "找内推（内推成功率是海投的 5–10 倍）：前同事、同学、GitHub 上聊过的人",
+        "week":  "W25"
+    },
+    {
+        "id":  "D176",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-26",
+        "task":  "每天投 3 家；每次面试后 24 小时内写《被问倒清单》（问题原文 + 我当时怎么答 + 正确答法）",
+        "week":  "W26"
+    },
+    {
+        "id":  "D177",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-27",
+        "task":  "每天投 3 家；每次面试后 24 小时内写《被问倒清单》（问题原文 + 我当时怎么答 + 正确答法）",
+        "week":  "W26"
+    },
+    {
+        "id":  "D178",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-28",
+        "task":  "每天投 3 家；每次面试后 24 小时内写《被问倒清单》（问题原文 + 我当时怎么答 + 正确答法）",
+        "week":  "W26"
+    },
+    {
+        "id":  "D179",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-29",
+        "task":  "每天投 3 家；每次面试后 24 小时内写《被问倒清单》（问题原文 + 我当时怎么答 + 正确答法）",
+        "week":  "W26"
+    },
+    {
+        "id":  "D180",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-04-30",
+        "task":  "每天投 3 家；每次面试后 24 小时内写《被问倒清单》（问题原文 + 我当时怎么答 + 正确答法）",
+        "week":  "W26"
+    },
+    {
+        "id":  "D181",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-01",
+        "task":  "每天投 3 家；每次面试后 24 小时内写《被问倒清单》（问题原文 + 我当时怎么答 + 正确答法）",
+        "week":  "W26"
+    },
+    {
+        "id":  "D182",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-02",
+        "task":  "复盘：统计被问最多的 3 个技术点",
+        "week":  "W26"
+    },
+    {
+        "id":  "D183",
+        "flag":  "",
+        "dow":  1,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-03",
+        "task":  "只补《被问倒清单》里出现 ≥2 次的知识点。一个点一天，学完立刻用它改一次自己的代码（否则等于没学）",
+        "week":  "W27"
+    },
+    {
+        "id":  "D184",
+        "flag":  "",
+        "dow":  2,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-04",
+        "task":  "只补《被问倒清单》里出现 ≥2 次的知识点。一个点一天，学完立刻用它改一次自己的代码（否则等于没学）",
+        "week":  "W27"
+    },
+    {
+        "id":  "D185",
+        "flag":  "",
+        "dow":  3,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-05",
+        "task":  "只补《被问倒清单》里出现 ≥2 次的知识点。一个点一天，学完立刻用它改一次自己的代码（否则等于没学）",
+        "week":  "W27"
+    },
+    {
+        "id":  "D186",
+        "flag":  "",
+        "dow":  4,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-06",
+        "task":  "只补《被问倒清单》里出现 ≥2 次的知识点。一个点一天，学完立刻用它改一次自己的代码（否则等于没学）",
+        "week":  "W27"
+    },
+    {
+        "id":  "D187",
+        "flag":  "",
+        "dow":  5,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-07",
+        "task":  "只补《被问倒清单》里出现 ≥2 次的知识点。一个点一天，学完立刻用它改一次自己的代码（否则等于没学）",
+        "week":  "W27"
+    },
+    {
+        "id":  "D188",
+        "flag":  "",
+        "dow":  6,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-08",
+        "task":  "写《8 个月从「只会指挥 AI」到交付 3 个项目》公开总结（这篇本身就是求职材料）",
+        "week":  "W27"
+    },
+    {
+        "id":  "D189",
+        "flag":  "",
+        "dow":  0,
+        "phaseName":  "求职冲刺",
+        "phase":  "M6",
+        "date":  "2027-05-09",
+        "task":  "定下一步：继续找工作 / 接小外包 / 用项目②做一个有人付费的小工具",
+        "week":  "W27"
+    }
+]

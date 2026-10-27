@@ -1,0 +1,24 @@
+# 数据与运行时产物
+server/data.db
+server/data.db-shm
+server/data.db-wal
+server/server.log
+server/web/*
+!server/web/index.html
+
+# 构建中间产物
+build/out/
+build/snaptest/
+build/*.keystore
+build/*.task.xml
+build/ygbuddy.keystore
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# 系统
+Thumbs.db
+desktop.ini
+.DS_Store
